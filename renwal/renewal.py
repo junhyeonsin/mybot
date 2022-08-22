@@ -2,6 +2,7 @@
 from discord.ext import tasks
 import enum
 import discord
+import os
 import datetime
 import random
 import sqlite3
@@ -739,4 +740,4 @@ async def Command(interaction:discord.Interaction, code:str):
     #cur.execute("CREATE TABLE IF NOT EXISTS skill(skill_name TEXT, skill_id INTEGER, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER)")
     #cur.execute("INSERT INTO skill VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",("찌르기",1,20,0,50,1,'blood',2,0,None,1,0,1))
     con.commit()
-client.run(['token'])
+client.run(os.environ['token'])
