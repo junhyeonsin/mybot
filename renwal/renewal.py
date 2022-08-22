@@ -16,7 +16,7 @@ class MyClient(discord.Client):
   @tasks.loop(time=datetime.time(hour=8,minute=0,second=0,tzinfo=KST))
   async def daily_message(self):
     channel=self.get_channel(955246009427038261)
-    await channel.send("ddd")
+    #await channel.send("ddd")
   async def on_ready(self):
     await self.wait_until_ready()
     await tree.sync(guild= discord.Object(id=955246008923742209))
@@ -88,13 +88,6 @@ client = MyClient(intents=intents)
 tree = app_commands.CommandTree(client)
 con = sqlite3.connect(r"./rpg.db",isolation_level=None)
 cur = con.cursor()
-class Color(enum.Enum):
-  레드=discord.Color.red()
-  블루=discord.Color.blue()
-  노랑=discord.Color.yellow()
-  초록=discord.Color.green()
-  골드=0xffd700
-  
 
 #./rpg.db
 #/생성 <닉네임>
@@ -124,57 +117,6 @@ async def register(interaction: discord.Interaction, 닉네임: str):
   inventory.first()
   await interaction.response.send_message(embed=embed,ephemeral=True)
 
-@tree.command(guild= discord.Object(id=955246008923742209),name="팀", description="역할")
-async def role(interaction:Interaction,색:Color):
-  guild=interaction.user.guild 
-  other=[]
-  for i in Color:
-    role=discord.utils.get(guild.roles,name=i.name)
-    if not role:
-      role= await guild.create_role(name=i.name,hoist=True,color=i.value)
-    if not i.name==색.name:
-      other.append(role)
-    else:
-      mine=role
-      print(mine)
-  category=discord.utils.get(guild.categories,name="팀 채팅방")
-  if not category:
-    category = await guild.create_category(name="팀 채팅방")   
-  channel=discord.utils.get(guild.channels,name=f"{색.name}팀-채팅방")
-  if not channel:
-    overwrites= {
-      guild.default_role:discord.PermissionOverwrite(view_channel=False),
-      mine:discord.PermissionOverwrite(send_messages=True,view_channel=True),
-    }
-    await guild.create_text_channel(name=f"{색.name}팀-채팅방",category=category,overwrites=overwrites)
-  for i in other:
-    await interaction.user.remove_roles(i)
-  await interaction.user.add_roles(mine)
-  await interaction.response.send_message(f"{색.name}팀으로 바뀌었습니다.",ephemeral=True)
-  #if not role in guild.roles:
-  #  guild.create_role(name="이름",hoist=True,colour=discord.Colour(3),)
-@tree.command(guild= discord.Object(id=955246008923742209),name="공포의쓴맛", description="공포의쓴맛을줄수있다.")
-async def ss(interaction:discord.Interaction,유저:discord.Member,시간:int=30,이유:str="그냥"):
-  if interaction.user.guild_permissions.administrator:
-    await 유저.timeout(datetime.timedelta(seconds=시간),reason=이유)
-    #datetime.datetime.now()+datetime.timedelta(seconds=시간)
-    await interaction.response.send_message(f"{유저} {시간}초 조용해짐! 사유:{이유}",ephemeral=True)
-  else:
-    await interaction.response.send_message("쓴맛을 줄 권한이 없어요!",ephemeral=True)
-@tree.command(guild= discord.Object(id=955246008923742209),name="밴", description="밴밴")
-async def dd(interaction:discord.Interaction,유저:discord.Member,시간:int=1,이유:str="그냥"):
-  if interaction.user.guild_permissions.administrator:
-    await 유저.ban(delete_message_days=시간,reason=이유)
-    await interaction.response.send_message(f"{유저} 밴됨! 이유:{이유}",ephemeral=True)
-  else:
-    await interaction.response.send_message("밴할 권한이 없어요!",ephemeral=True)
-@tree.command(guild= discord.Object(id=955246008923742209),name="킥", description="킥킥")
-async def dd(interaction:discord.Interaction,유저:discord.Member,이유:str="그냥"):
-  if interaction.user.guild_permissions.administrator:
-    await 유저.kick(reason=이유)
-    await interaction.response.send_message(f"{유저} 킥됨! 사유:{이유}",ephemeral=True)
-  else:
-    await interaction.response.send_message("킥할 권한이 없어요!",ephemeral=True)
 
 #/정보 <유저>  
 @tree.command(guild= discord.Object(id=955246008923742209),name="정보", description="캐릭터 정보를 확인합니다.")
