@@ -190,7 +190,7 @@ async def joinmusic(interaction:Interaction):
 async def playmusic(interaction:Interaction,url_title:str):
   await interaction.response.send_message("노래를 찾고있어요!!")
   if interaction.user.voice is None:
-    await interaction.response.send_message(content="아무 채널에도 들어가있지 않아요.")
+    await interaction.edit_original_response(content="아무 채널에도 들어가있지 않아요.")
   else:
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
     if voice_client == None:
@@ -200,9 +200,9 @@ async def playmusic(interaction:Interaction,url_title:str):
     queue.append(player)
     if not voice_client.is_playing():
       voice_client.play(player,after=lambda e: nextsong(interaction))
-      await interaction.edit_original_message(content=f"{player.title} 재생중!!")
+      await interaction.edit_original_response(content=f"{player.title} 재생중!!")
     else:
-      await interaction.edit_original_message(content=f"{player.title} 재생목록 추가됨!")
+      await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
     await asyncio.sleep(7)
     await interaction.delete_original_message()
 @tree.command(guild= discord.Object(id=GUILD_ID),name="shuffle", description="노래 셔플")
