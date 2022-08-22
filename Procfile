@@ -1,1 +1,1 @@
-worker: python renewal/renewal.py
+worker: python renwal/renewal.py
