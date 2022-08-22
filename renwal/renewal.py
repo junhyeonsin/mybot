@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from discord.ext import tasks
 import enum
+import youtube_dl
 import discord
 import os
 import datetime
@@ -89,6 +90,145 @@ tree = app_commands.CommandTree(client)
 con = sqlite3.connect(r"./rpg.db",isolation_level=None)
 cur = con.cursor()
 
+
+GUILD_ID=955246008923742209
+youtube_dl.utils.bug_reports_message = lambda: ''
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ffmpeg_options = {
+    'options': '-vn',
+}
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+class MyClient(discord.Client):
+  async def on_ready(self):
+    await self.wait_until_ready()
+    await tree.sync(guild= discord.Object(id=GUILD_ID))
+    print(f"{self.user} 에 로그인하였습니다!")
+intents= discord.Intents.all()
+client = MyClient(intents=intents)
+tree = app_commands.CommandTree(client)
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=True, stream=True):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        print(len(data['entries']))
+        if 'entries' in data:
+            # take first item from a playlist
+            data=data['entries'][0]
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+queue=[]
+
+def nextsong(interaction:Interaction):
+  voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+  if len(queue)>0:
+    queue.pop(0)
+  if not voice_client is None:
+    voice_client.stop()
+  if not len(queue)==0:
+    voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+    voice_client.play(queue[0],after=lambda e:nextsong(interaction))
+@tree.command(guild= discord.Object(id=GUILD_ID),name="queue", description="노래 리스트")
+async def queuelist(interaction:Interaction):
+  if len(queue)==0:
+    return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
+  global page
+  page=1
+  def em():
+    embed= discord.Embed(title="노래 리스트")
+    for i in range((page-1)*10,page*10):
+      if len(queue)>i:
+        embed.add_field(name=f"{i+1}. {queue[i].title}",value="\u200b",inline=False)
+    embed.set_footer(text=f"Page : {page}")
+    return embed
+  def vi():
+    view= ui.View()
+    undo = ui.Button(style=ButtonStyle.green,label="이전으로",disabled=(True if page==1 else False))
+    next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue) <= page*10 else False))
+    refresh= ui.Button(style=ButtonStyle.red,label="새로고침")
+    view.add_item(undo)
+    view.add_item(next)
+    view.add_item(refresh)
+    refresh.callback=refresh_callback
+    undo.callback=undo_callback
+    next.callback=next_callback
+    return view
+  async def refresh_callback(interaction:Interaction):
+    global page
+    await interaction.response.edit_message(embed=em(),view=vi())
+  async def undo_callback(interaction:Interaction):
+    global page
+    page-=1
+    await interaction.response.edit_message(embed=em(),view=vi())
+  async def next_callback(interaction:Interaction):
+    global page
+    page +=1
+    await interaction.response.edit_message(embed=em(),view=vi())
+  await interaction.response.send_message(embed=em(),view=vi())
+@tree.command(guild= discord.Object(id=GUILD_ID),name="join", description="봇 초대")
+async def joinmusic(interaction:Interaction):
+  voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+  if voice_client is None and interaction.user.voice is not None:
+    await interaction.user.voice.channel.connect()
+    voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+  await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
+
+@tree.command(guild= discord.Object(id=GUILD_ID),name="play", description="노래 시작")
+async def playmusic(interaction:Interaction,url_title:str):
+  await interaction.response.send_message("노래를 찾고있어요!!")
+  if interaction.user.voice is None:
+    await interaction.response.send_message(content="아무 채널에도 들어가있지 않아요.")
+  else:
+    voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+    if voice_client == None:
+      await interaction.user.voice.channel.connect()
+      voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+    player = await YTDLSource.from_url(url_title, loop=None)
+    queue.append(player)
+    if not voice_client.is_playing():
+      voice_client.play(player,after=lambda e: nextsong(interaction))
+      await interaction.edit_original_message(content=f"{player.title} 재생중!!")
+    else:
+      await interaction.edit_original_message(content=f"{player.title} 재생목록 추가됨!")
+    await asyncio.sleep(7)
+    await interaction.delete_original_message()
+@tree.command(guild= discord.Object(id=GUILD_ID),name="shuffle", description="노래 셔플")
+async def shfflemusic(interaction:Interaction):
+  global queue
+  random.shuffle(queue)
+  await interaction.response.send_message("음악이 셔플되었습니다.")
+@tree.command(guild= discord.Object(id=GUILD_ID),name="skip", description="노래 스킵")
+async def skipmusic(interaction:Interaction,갯수:int=1):
+  global queue
+  if 갯수 > len(queue):
+    갯수=len(queue)
+  queue=queue[갯수-1:len(queue)]
+  await interaction.response.send_message(f"{갯수}개의 음악이 삭제되었습니다.")
+  voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+  voice_client.stop()
+  await asyncio.sleep(7)
+  await interaction.delete_original_message()
 #./rpg.db
 #/생성 <닉네임>
 @tree.command(guild= discord.Object(id=955246008923742209),name="생성", description="아이디를 생성합니다.")
