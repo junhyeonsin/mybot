@@ -6,7 +6,6 @@ import datetime
 import random
 import sqlite3
 import asyncio
-import sel
 from discord import Colour, Interaction, ui,app_commands,Button,ButtonStyle,SelectMenu,SelectOption
 from discord.ext import commands
 from renewal_class import *
@@ -96,14 +95,6 @@ class Color(enum.Enum):
   골드=0xffd700
   
 
-@tree.command(guild= discord.Object(id=955246008923742209),name="ㅂㄴㄷ", description="잘합니다.")
-async def benedu(interaction:Interaction,아이디:str,비밀번호:str):
-  await interaction.response.defer(ephemeral=True)
-  error=await sel.start(아이디,비밀번호)
-  print(error)
-  #if error:
-  #  await interaction.response.send_message(content=error,ephemeral=True)
-  #await asyncio.sleep(5)
 #./rpg.db
 #/생성 <닉네임>
 @tree.command(guild= discord.Object(id=955246008923742209),name="생성", description="아이디를 생성합니다.")
