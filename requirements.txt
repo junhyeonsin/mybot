@@ -1,0 +1,4 @@
+discord.py
+asyncio
+sqlite3
+discord.ext
