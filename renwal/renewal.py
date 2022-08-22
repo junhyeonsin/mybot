@@ -111,14 +111,6 @@ ffmpeg_options = {
     'options': '-vn',
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-class MyClient(discord.Client):
-  async def on_ready(self):
-    await self.wait_until_ready()
-    await tree.sync(guild= discord.Object(id=GUILD_ID))
-    print(f"{self.user} 에 로그인하였습니다!")
-intents= discord.Intents.all()
-client = MyClient(intents=intents)
-tree = app_commands.CommandTree(client)
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
