@@ -144,7 +144,9 @@ def nextsong(interaction:Interaction):
 @tree.command(guild= discord.Object(id=GUILD_ID),name="queue", description="노래 리스트")
 async def queuelist(interaction:Interaction):
   if len(queue)==0:
-    return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
+    await interaction.response.send_message("음악이 없어요!",ephemeral=True)
+    await asyncio.sleep(7)
+    return await interaction.delete_original_response()
   global page
   page=1
   def em():
@@ -214,6 +216,8 @@ async def shfflemusic(interaction:Interaction):
   queue=set(queue)
   queue=list(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
+  await asyncio.sleep(7)
+  await interaction.delete_original_response()
 @tree.command(guild= discord.Object(id=GUILD_ID),name="skip", description="노래 스킵")
 async def skipmusic(interaction:Interaction,갯수:int=1):
   global queue
@@ -221,10 +225,11 @@ async def skipmusic(interaction:Interaction,갯수:int=1):
     갯수=len(queue)
   queue=queue[갯수-1:len(queue)]
   await interaction.response.send_message(f"{갯수}개의 음악이 삭제되었습니다.")
+  await asyncio.sleep(4)
+  await interaction.delete_original_message()
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   voice_client.stop()
-  await asyncio.sleep(7)
-  await interaction.delete_original_message()
+
 #./rpg.db
 #/생성 <닉네임>
 @tree.command(guild= discord.Object(id=955246008923742209),name="생성", description="아이디를 생성합니다.")
