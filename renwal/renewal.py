@@ -225,11 +225,10 @@ async def skipmusic(interaction:Interaction,갯수:int=1):
     갯수=len(queue)
   queue=queue[갯수-1:len(queue)]
   await interaction.response.send_message(f"{갯수}개의 음악이 삭제되었습니다.")
-  await asyncio.sleep(4)
-  await interaction.delete_original_response()
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   voice_client.stop()
-
+  await asyncio.sleep(7)
+  await interaction.delete_original_response()
 #./rpg.db
 #/생성 <닉네임>
 @tree.command(guild= discord.Object(id=955246008923742209),name="생성", description="아이디를 생성합니다.")
