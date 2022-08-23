@@ -183,11 +183,12 @@ async def joinmusic(interaction:Interaction):
   if voice_client is None and interaction.user.voice is not None:
     await interaction.user.voice.channel.connect()
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
+    return await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
+  print(voice_client.channel,interaction.user.voice.channel)
   if voice_client.channel != interaction.user.voice.channel and interaction.user.voice.channel is not None:
     await interaction.user.voice.channel.connect()
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-
+    return await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
 
 @tree.command(guild= discord.Object(id=GUILD_ID),name="play", description="노래 시작")
 async def playmusic(interaction:Interaction,url_title:str):
