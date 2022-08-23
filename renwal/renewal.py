@@ -213,6 +213,7 @@ async def shfflemusic(interaction:Interaction):
   for i in range(len(queue)):
     if queue[i]==first:
       del queue[i]
+      break
   queue.insert(0,first)
   print(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
