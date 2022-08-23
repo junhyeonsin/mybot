@@ -124,7 +124,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
     async def from_url(cls, url, *, loop=True, stream=True):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-        print(len(data['entries']))
         if 'entries' in data:
             # take first item from a playlist
             data=data['entries'][0]
@@ -210,11 +209,12 @@ async def shfflemusic(interaction:Interaction):
   global queue
   first=queue[0]
   random.shuffle(queue)
+  print(queue)
+  for i in range(len(queue)):
+    if queue[i]==first:
+      del queue[i]
   queue.insert(0,first)
   print(queue)
-  queue=set(queue)
-  print(queue)
-  queue=list(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
   await interaction.delete_original_response()
