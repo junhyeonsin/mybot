@@ -208,7 +208,11 @@ async def playmusic(interaction:Interaction,url_title:str):
 @tree.command(guild= discord.Object(id=GUILD_ID),name="shuffle", description="노래 셔플")
 async def shfflemusic(interaction:Interaction):
   global queue
+  first=queue[0]
   random.shuffle(queue)
+  queue.insert(0,first)
+  queue=set(queue)
+  queue=list(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
 @tree.command(guild= discord.Object(id=GUILD_ID),name="skip", description="노래 스킵")
 async def skipmusic(interaction:Interaction,갯수:int=1):
