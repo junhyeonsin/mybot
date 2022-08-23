@@ -206,7 +206,7 @@ async def playmusic(interaction:Interaction,url_title:str):
     else:
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
     await asyncio.sleep(7)
-    await interaction.delete_original_message()
+    await interaction.delete_original_response()
 @tree.command(guild= discord.Object(id=GUILD_ID),name="shuffle", description="노래 셔플")
 async def shfflemusic(interaction:Interaction):
   global queue
@@ -226,7 +226,7 @@ async def skipmusic(interaction:Interaction,갯수:int=1):
   queue=queue[갯수-1:len(queue)]
   await interaction.response.send_message(f"{갯수}개의 음악이 삭제되었습니다.")
   await asyncio.sleep(4)
-  await interaction.delete_original_message()
+  await interaction.delete_original_response()
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   voice_client.stop()
 
