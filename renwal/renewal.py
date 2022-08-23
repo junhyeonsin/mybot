@@ -144,9 +144,7 @@ def nextsong(interaction:Interaction):
 @tree.command(guild= discord.Object(id=GUILD_ID),name="queue", description="노래 리스트")
 async def queuelist(interaction:Interaction):
   if len(queue)==0:
-    await interaction.response.send_message("음악이 없어요!",ephemeral=True)
-    await asyncio.sleep(7)
-    return await interaction.delete_original_response()
+    return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
   global page
   page=1
   def em():
