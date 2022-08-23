@@ -211,7 +211,9 @@ async def shfflemusic(interaction:Interaction):
   first=queue[0]
   random.shuffle(queue)
   queue.insert(0,first)
+  print(queue)
   queue=set(queue)
+  print(queue)
   queue=list(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
