@@ -43,6 +43,7 @@ class Skill():
     clas=cur.fetchone()[0]
     cur.execute("SELECT * FROM skill WHERE skill_class = %s AND skill_level = 0",(clas))
     skill=cur.fetchall()
+    skill=list(skill)
     cur.execute(f"SELECT skill_id FROM `{self.id}_skill`")
     primarykey=cur.fetchall()
     if primarykey:
@@ -52,6 +53,7 @@ class Skill():
           del skill[j]
         else:
           j+=1    
+    skill=tuple(skill)
     cur.executemany(f"INSERT INTO `{self.id}_skill` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(skill))
     con.commit()
   def canskill(self):
