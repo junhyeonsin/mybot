@@ -653,11 +653,11 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     item=inventory.item()
     item=list(item)
     view = ui.View()
-    list=["_use","_etc","_cash"]
+    li=["_use","_etc","_cash"]
     if len(inventory.item())==0:
       embed.add_field(name="아이템이 없어요!",value="\u200b")
       return await interaction.response.edit_message(embed=embed,view=None)
-    if inventory.value in list:
+    if inventory.value in li:
       j=0
       for i in range(len(inventory.item())):
         if item[i-j][2]==0:
