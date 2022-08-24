@@ -39,6 +39,7 @@ class MyClient(discord.Client):
         for g in items:
             await client.change_presence(status = discord.Status.online, activity = discord.Game(g))
             await asyncio.sleep(5)
+db_info=[os.environ['user'],os.environ['password'],os.environ['host'],os.environ['database']]
 con=pymysql.connect(user=['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
 cur = con.cursor()
 class reportModal(ui.Modal, title="건의"):
