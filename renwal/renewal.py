@@ -482,7 +482,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
   
   async def item_select_callback(interaction:discord.Interaction):
     embed= em()
-    cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM `{interaction.user.id}_use` WHERE item_code BETWEEN 1 AND 50 AND item_amount IS NOT 0")
+    cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM `{interaction.user.id}_use` WHERE item_code BETWEEN 1 AND 50 AND item_amount != 0")
     getItem=cur.fetchall()
     view = ui.View()
     select = ui.Select(placeholder="아이템 사용",options=[SelectOption(label="돌아가기",value=-1)])
@@ -496,7 +496,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
     await interaction.response.edit_message(embed=embed,view=view)
   async def skill_select_callback(interaction:discord.Interaction):
     embed= em()
-    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{interaction.user.id}_skill` WHERE skill_level IS NOT 0 ")
+    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{interaction.user.id}_skill` WHERE skill_level != 0 ")
     getSkill=cur.fetchall()
     view = ui.View()
     select= ui.Select(placeholder="스킬 사용",options=[SelectOption(label="돌아가기",value=-1)])

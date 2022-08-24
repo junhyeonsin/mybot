@@ -55,7 +55,7 @@ class Skill():
     cur.executemany(f"INSERT INTO `{self.id}_skill` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(skill))
     con.commit()
   def canskill(self):
-    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{self.id}_skill` WHERE skill_level IS NOT 0 ")
+    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{self.id}_skill` WHERE skill_level != 0 ")
     getSkill=cur.fetchall()
     if not len(getSkill):
       return True
