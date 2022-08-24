@@ -45,7 +45,7 @@ class Reinforce():
     self.number=number
     self.rank=rank
   def require(self):
-    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank))
     money=cur.fetchone()[self.number+1]
     money=int(money)
     if self.gold < money or self.item < money/50:
@@ -53,7 +53,7 @@ class Reinforce():
     else:
       return False
   def rein(self):
-    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank))
     percent=cur.fetchone()[self.number+1]
     percent=int(percent)
     r = random.randint(1,100)
@@ -62,10 +62,10 @@ class Reinforce():
     else:
       return False
   def display(self):
-    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank))
     money=cur.fetchone()[self.number+1]
     money=int(money)
-    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank))
     percent=cur.fetchone()[self.number+1]
     percent = int(percent)
     return money,percent
@@ -169,11 +169,11 @@ class Default():
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
-    cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None,))
+    cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None))
     con.commit()
 
   def isLevel(self):
-    cur.execute("SELECT exp,level FROM user_data WHERE id = ?",(self.id,))
+    cur.execute("SELECT exp,level FROM user_data WHERE id = ?",(self.id))
     exp,level=cur.fetchone()
     exp=int(exp)
     level=int(level)
@@ -182,8 +182,8 @@ class Default():
       exp-=(level*30)*(int(level/15+1))
       gap+=1
       level+=1
-    cur.execute(f"UPDATE user_data SET exp={exp}, level={level} WHERE id =?",(self.id,))
-    cur.execute(f"UPDATE user_stat SET stat_point=stat_point+{gap*3},skill_point=skill_point+{gap} WHERE id=?",(self.id,))
+    cur.execute(f"UPDATE user_data SET exp={exp}, level={level} WHERE id =?",(self.id))
+    cur.execute(f"UPDATE user_stat SET stat_point=stat_point+{gap*3},skill_point=skill_point+{gap} WHERE id=?",(self.id))
     con.commit()
     if gap>0:
       return level
@@ -214,8 +214,8 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
-      cur.execute(f"UPDATE `{self.id}_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
-      cur.execute(f"SELECT item_name FROM `{self.id}_etc` WHERE item_code = ?",(code[i],))
+      cur.execute(f"UPDATE `{self.id}_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i]))
+      cur.execute(f"SELECT item_name FROM `{self.id}_etc` WHERE item_code = ?",(code[i]))
       name.append(cur.fetchone()[0])
     con.commit()
     return name,rand
@@ -237,23 +237,23 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
-      cur.execute(f"UPDATE `{self.id}_use` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
-      cur.execute(f"SELECT item_name FROM `{self.id}_use` WHERE item_code = ?",(code[i],))
+      cur.execute(f"UPDATE `{self.id}_use` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i]))
+      cur.execute(f"SELECT item_name FROM `{self.id}_use` WHERE item_code = ?",(code[i]))
       name.append(cur.fetchone()[0])
     con.commit()
     return name,rand
   def defualt(self):
-    cur.execute(f"UPDATE user_data SET exp=exp+{self.exp}, money=money+{self.money} WHERE id = ?",(self.id,))   
+    cur.execute(f"UPDATE user_data SET exp=exp+{self.exp}, money=money+{self.money} WHERE id = ?",(self.id))   
     con.commit() 
   def wear(self):
     if self.get():
-      cur.execute(f"SELECT COUNT(*) FROM loot_table_wear WHERE floor=?",(self.floor,))
+      cur.execute(f"SELECT COUNT(*) FROM loot_table_wear WHERE floor=?",(self.floor))
       amount = cur.fetchone()
       amount=int(amount[0])
       if amount==0:
         return None      
       amount = random.randint(0,amount-1)
-      cur.execute(f"SELECT * FROM loot_table_wear WHERE floor = ? LIMIT {amount}, 1",(self.floor,))
+      cur.execute(f"SELECT * FROM loot_table_wear WHERE floor = ? LIMIT {amount}, 1",(self.floor))
       info = cur.fetchone()
       stat=[]
       for i in range(3):
@@ -274,13 +274,13 @@ class Reward():
     return None
   def weapon(self):
     if self.get():
-      cur.execute(f"SELECT COUNT(*) FROM loot_table_weapon WHERE floor=?",(self.floor,))
+      cur.execute(f"SELECT COUNT(*) FROM loot_table_weapon WHERE floor=?",(self.floor))
       amount = cur.fetchone()
       amount=int(amount[0])
       if amount==0:
         return None
       amount = random.randint(0,amount-1)
-      cur.execute(f"SELECT * FROM loot_table_weapon WHERE floor = ? LIMIT {amount}, 1",(self.floor,))
+      cur.execute(f"SELECT * FROM loot_table_weapon WHERE floor = ? LIMIT {amount}, 1",(self.floor))
       info = cur.fetchone()
       stat=[]
       for i in range(3):
@@ -311,7 +311,7 @@ class Dungeon():
     self.id=id
     self.dic=dic
     self.floor=floor
-  def go(self,):
+  def go(self):
     if self.id in self.dic and self.dic[self.id]:
       return self.dic,"이미 던전에 있어요!"
     self.dic[self.id]=True
@@ -327,7 +327,7 @@ class Dungeon():
     r=random.randint(0,int(check[0])-1)
     cur.execute(f"SELECT * FROM enemy WHERE floor = {self.floor} LIMIT {r}, 1")  
     enemy=cur.fetchone()
-    cur.execute(f"SELECT str,hp,name,mp FROM user_stat WHERE id = ?",(self.id,))
+    cur.execute(f"SELECT str,hp,name,mp FROM user_stat WHERE id = ?",(self.id))
     stat=cur.fetchone()
     cur.execute(f"SELECT SUM(str),SUM(hp),SUM(mp) FROM `{self.id}_wear` WHERE wear=1 ")
     item=cur.fetchone()

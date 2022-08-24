@@ -773,8 +773,8 @@ async def Cut(interaction:discord.Interaction,sure:bool):
     button=ui.Button(label="네.",style=ButtonStyle.danger)
     view.add_item(button)
     async def button_callback(interaction:discord.Interaction):
-      cur.execute("DELETE FROM user_stat WHERE id = ? ",(interaction.user.id,),)
-      cur.execute("DELETE FROM user_data WHERE id = ? ",(interaction.user.id,),)
+      cur.execute("DELETE FROM user_stat WHERE id = ? ",(interaction.user.id,))
+      cur.execute("DELETE FROM user_data WHERE id = ? ",(interaction.user.id,))
       li=["weapon","wear","etc","use","cash"]
       for i in li:
         cur.execute(f"DELETE FROM trade_{i} WHERE id = ?",(interaction.user.id,))
