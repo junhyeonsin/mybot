@@ -132,7 +132,7 @@ class Default():
 
       cur.execute(f"SELECT * FROM `etc`")
       data=cur.fetchall()
-
+      data=list(data)
       cur.execute(f"SELECT item_code FROM `{self.id}_etc`")
       primarykey=cur.fetchall()
       if primarykey:
@@ -143,11 +143,13 @@ class Default():
           else:
             j+=1
       print(data)
+      data=tuple(data)
       cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(%s,%s,%s,%s,%s,%s)",(data,))
       con.commit()
     def use():
       cur.execute(f"SELECT * FROM `use`")
       data=cur.fetchall()
+      data=list(data)
       cur.execute(f"SELECT item_code FROM `{self.id}_use`")
       primarykey=cur.fetchall()
       if primarykey:
@@ -158,6 +160,7 @@ class Default():
           else:
             j+=1
       print(data)
+      data=tuple(data)
       cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",(data))
       con.commit()
     use()
