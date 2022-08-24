@@ -22,7 +22,7 @@ class MyClient(discord.Client):
     #await channel.send("ddd")
   async def on_ready(self):
     await self.wait_until_ready()
-    await tree.sync(guild= discord.Object(id=955246008923742209))
+    await tree.sync()
     print(f"{self.user} 에 로그인하였습니다!")
     self.daily_message.start()
     await self.bt(["코드 최적화","그림쟁이 구","개발 연기"])
@@ -140,7 +140,7 @@ def nextsong(interaction:Interaction):
   if not len(queue)==0:
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
     voice_client.play(queue[0],after=lambda e:nextsong(interaction))
-@tree.command(guild= discord.Object(id=GUILD_ID),name="queue", description="노래 리스트")
+@tree.command(name="queue", description="노래 리스트")
 async def queuelist(interaction:Interaction):
   if len(queue)==0:
     return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
@@ -177,7 +177,7 @@ async def queuelist(interaction:Interaction):
     page +=1
     await interaction.response.edit_message(embed=em(),view=vi())
   await interaction.response.send_message(embed=em(),view=vi())
-@tree.command(guild= discord.Object(id=GUILD_ID),name="join", description="봇 초대")
+@tree.command(name="join", description="봇 초대")
 async def joinmusic(interaction:Interaction):
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   if voice_client is None and interaction.user.voice is not None:
@@ -189,7 +189,7 @@ async def joinmusic(interaction:Interaction):
     await interaction.user.voice.channel.connect()
     return await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
 
-@tree.command(guild= discord.Object(id=GUILD_ID),name="play", description="노래 시작")
+@tree.command(name="play", description="노래 시작")
 async def playmusic(interaction:Interaction,url_title:str):
   await interaction.response.send_message("노래를 찾고있어요!!")
   if interaction.user.voice is None:
@@ -208,7 +208,7 @@ async def playmusic(interaction:Interaction,url_title:str):
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
     await asyncio.sleep(7)
     await interaction.delete_original_response()
-@tree.command(guild= discord.Object(id=GUILD_ID),name="shuffle", description="노래 셔플")
+@tree.command(name="shuffle", description="노래 셔플")
 async def shfflemusic(interaction:Interaction):
   global queue
   first=queue[0]
@@ -223,7 +223,7 @@ async def shfflemusic(interaction:Interaction):
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
   await interaction.delete_original_response()
-@tree.command(guild= discord.Object(id=GUILD_ID),name="skip", description="노래 스킵")
+@tree.command(name="skip", description="노래 스킵")
 async def skipmusic(interaction:Interaction,갯수:int=1):
   global queue
   if 갯수 > len(queue):
@@ -236,7 +236,7 @@ async def skipmusic(interaction:Interaction,갯수:int=1):
   await interaction.delete_original_response()
 #./rpg.db
 #/생성 <닉네임>
-@tree.command(guild= discord.Object(id=955246008923742209),name="생성", description="아이디를 생성합니다.")
+@tree.command(name="생성", description="아이디를 생성합니다.")
 async def register(interaction: discord.Interaction, 닉네임: str):
   embed = discord.Embed(title="아이디 생성")
   value=""
@@ -264,7 +264,7 @@ async def register(interaction: discord.Interaction, 닉네임: str):
 
 
 #/정보 <유저>  
-@tree.command(guild= discord.Object(id=955246008923742209),name="정보", description="캐릭터 정보를 확인합니다.")
+@tree.command(name="정보", description="캐릭터 정보를 확인합니다.")
 async def info(interaction:discord.Interaction, 유저 : discord.Member):
   cur.execute("SELECT * FROM user_data WHERE id = %s",(유저.id))
   check=cur.fetchone()
@@ -318,7 +318,7 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
   button.callback=info_callback
   await interaction.response.send_message("",view=view,ephemeral=True)
 
-@tree.command(guild= discord.Object(id=955246008923742209),name="던전초기화", description="던전 상태를 초기화합니다.")
+@tree.command(name="던전초기화", description="던전 상태를 초기화합니다.")
 async def dungeonreset(interaction:Interaction):
   a=random.randint(10000,99999)
   class dungeonModal(ui.Modal, title=f"초기화 코드 : {a}"):
@@ -337,7 +337,7 @@ async def dungeonreset(interaction:Interaction):
         await interaction.response.send_message("초기화 실패",ephemeral=True)
   await interaction.response.send_modal(dungeonModal())
 #/스텟 <스텟> <포인트>
-@tree.command(guild= discord.Object(id=955246008923742209),name="스텟", description="스테이터스를 올립니다.")
+@tree.command(name="스텟", description="스테이터스를 올립니다.")
 async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int ):
   cur.execute("SELECT stat_point,hp FROM user_stat WHERE id = %s",(interaction.user.id))
   check=cur.fetchone()
@@ -359,7 +359,7 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
   await interaction.response.send_message(embed=embed,ephemeral=True)
 
 #/강화소 <장비>
-@tree.command(guild= discord.Object(id=955246008923742209),name="강화소", description="착용중인 아이템을 강화합니다.")
+@tree.command(name="강화소", description="착용중인 아이템을 강화합니다.")
 async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
   if 장비.value != 0:
     cur.execute(f"SELECT * FROM `{interaction.user.id}_wear` WHERE part = %s AND wear = %s ",(장비.value,1))
@@ -435,7 +435,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
 
 #/던전 <층>
 dungeon_dic={}
-@tree.command(guild= discord.Object(id=955246008923742209),name="던전", description="던전입니다.")
+@tree.command(name="던전", description="던전입니다.")
 async def dungeon(interaction:discord.Interaction,층:int):
   skill=Skill(interaction.user.id)
   default = Default(interaction.user.id)
@@ -634,13 +634,13 @@ async def dungeon(interaction:discord.Interaction,층:int):
       dungeon_dic[interaction.user.id]=False
       await interaction.response.edit_message(embed=embed,view=view)
   await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
-@tree.command(guild= discord.Object(id=955246008923742209),name="가이드", description="ㅇㅇ")
+@tree.command(name="가이드", description="ㅇㅇ")
 async def Guide(interaction:discord.Interaction):
   embed=discord.Embed(title="MOTD")
   embed.add_field(name="ㅇㅇ",value="ㅇㅇ")
   await interaction.response.send_message(content=interaction.user.mention,embed=embed,ephemeral=True)
 
-@tree.command(guild= discord.Object(id=955246008923742209),name="인벤토리", description="인벤토리를 엽니다.")
+@tree.command(name="인벤토리", description="인벤토리를 엽니다.")
 async def Inventory(interaction:discord.Interaction, 종류:Inventory):
   async def inventory_callback(interaction:discord.Interaction):
     embed=discord.Embed(title=f"{종류.name} 인벤토리")
@@ -719,8 +719,8 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
 
 
 
-#@tree.command(guild= discord.Object(id=955246008923742209),name="전직", description="전직을 할수 있습니다.")
-@tree.command(guild= discord.Object(id=955246008923742209),name="스킬", description="스킬을 찍을수 있습니다.")
+#@tree.command(name="전직", description="전직을 할수 있습니다.")
+@tree.command(name="스킬", description="스킬을 찍을수 있습니다.")
 async def 스킬(interaction:discord.Interaction):
   skill=Skill(interaction.user.id)
   skill.isSkill()
@@ -766,7 +766,7 @@ async def 스킬(interaction:discord.Interaction):
   select.callback=select_callback
   await interaction.response.send_message(view=view,ephemeral=True)
 
-@tree.command(guild= discord.Object(id=955246008923742209),name="계정삭제", description="계정과 관련된 모든 데이터가 삭제됩니다.")
+@tree.command(name="계정삭제", description="계정과 관련된 모든 데이터가 삭제됩니다.")
 async def Cut(interaction:discord.Interaction,sure:bool):
   if sure:
     view = ui.View()
@@ -786,10 +786,10 @@ async def Cut(interaction:discord.Interaction,sure:bool):
       await interaction.response.edit_message(content="삭제되었습니다",view=None)
     button.callback=button_callback
     await interaction.response.send_message(content="확실합니까%s",view=view,ephemeral=True) 
-@tree.command(guild= discord.Object(id=955246008923742209),name="건의하기", description="건의를 할수있습니다.")
+@tree.command(name="건의하기", description="건의를 할수있습니다.")
 async def modal(interaction:discord.Interaction):
   await interaction.response.send_modal(reportModal())
-@tree.command(guild= discord.Object(id=955246008923742209),name="데이터", description="..")
+@tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
   if code=="아잉아잉0325":
     #test1=Reward(1,interaction.user.id,0,0)
