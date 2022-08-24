@@ -651,6 +651,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     embed=discord.Embed(title=f"{종류.name} 인벤토리")
     inventory=ItemInventory(interaction.user.id,종류.value)
     item=inventory.item()
+    item=list(item)
     view = ui.View()
     list=["_use","_etc","_cash"]
     if len(inventory.item())==0:
