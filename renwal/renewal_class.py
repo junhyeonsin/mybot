@@ -125,7 +125,7 @@ class Default():
 
     li=['use','etc','cash']
     for i in li:
-      cur.execute(f"CREATE TABLE IF NOT EXISTS {i}(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")
+      cur.execute(f"CREATE TABLE IF NOT EXISTS `{i}`(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")
     con.commit()
 
     def etc():
