@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import math
 import random
-import sqlite3
+import pymysql
 import discord
+import os
+con=pymysql.connect(user=['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
+cur = con.cursor()
 #경험치바
 class Exp():
   def __init__(self,now,max):
@@ -34,8 +37,6 @@ class Class():
   def display(self):
     class_name=['초보자','전사','궁수','마법사','도적']
     return class_name[self.number]
-con=sqlite3.connect(r'./rpg.db',isolation_level=None)
-cur=con.cursor()
     
 class Reinforce():
   def __init__(self,gold,item,number,rank):
@@ -121,20 +122,17 @@ class Default():
   def __init__(self,id):
     self.id=id
   def isItem(self):
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
+
     li=['use','etc','cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS {i}(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")
     con.commit()
 
     def etc():
-      con=sqlite3.connect(r"./rpg.db")
-      cur=con.cursor()
+
       cur.execute(f"SELECT * FROM etc")
       data=cur.fetchall()
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
+
       cur.execute(f"SELECT item_code FROM '''{self.id}_etc'''")
       primarykey=cur.fetchall()
       if primarykey:
@@ -147,12 +145,8 @@ class Default():
       cur.executemany(f"INSERT INTO '''{self.id}_etc''' VALUES(?,?,?,?,?,?)",(data))
       con.commit()
     def use():
-      con=sqlite3.connect(r"./rpg.db")
-      cur=con.cursor()
       cur.execute(f"SELECT * FROM use")
       data=cur.fetchall()
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       cur.execute(f"SELECT item_code FROM '''{self.id}_use'''")
       primarykey=cur.fetchall()
       if primarykey:
@@ -168,8 +162,6 @@ class Default():
     etc()
     con.commit()
   def isInventory(self):
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     li=['_use','_etc','_cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}{i}'''(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
@@ -177,14 +169,10 @@ class Default():
     cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}_wear'''(item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
     cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}_skill'''(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     cur.execute(f"INSERT INTO '''{self.id}_weapon''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None,))
     con.commit()
 
   def isLevel(self):
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     cur.execute("SELECT exp,level FROM user_data WHERE id = ?",(self.id,))
     exp,level=cur.fetchone()
     exp=int(exp)
@@ -209,8 +197,6 @@ class Reward():
     self.exp=exp
     self.money=money
   def etc(self,enemy):
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     code=enemy[7].split()
     percent=enemy[8].split()
     amount=enemy[9].split()
@@ -234,8 +220,6 @@ class Reward():
     con.commit()
     return name,rand
   def use(self,enemy):
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     code=enemy[10].split()
     percent=enemy[11].split()
     amount=enemy[12].split()
@@ -259,14 +243,10 @@ class Reward():
     con.commit()
     return name,rand
   def defualt(self):
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     cur.execute(f"UPDATE user_data SET exp=exp+{self.exp}, money=money+{self.money} WHERE id = ?",(self.id,))   
     con.commit() 
   def wear(self):
     if self.get():
-      con=sqlite3.connect(r"./rpg.db")
-      cur=con.cursor()
       cur.execute(f"SELECT COUNT(*) FROM loot_table_wear WHERE floor=?",(self.floor,))
       amount = cur.fetchone()
       amount=int(amount[0])
@@ -288,16 +268,12 @@ class Reward():
       stat.append(0)
       stat.append(info[16])   
       stat.append(info[18])
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       cur.execute(f"INSERT INTO '''{self.id}_wear''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
       con.commit()
       return info[0]
     return None
   def weapon(self):
     if self.get():
-      con=sqlite3.connect(r"./rpg.db")
-      cur=con.cursor()
       cur.execute(f"SELECT COUNT(*) FROM loot_table_weapon WHERE floor=?",(self.floor,))
       amount = cur.fetchone()
       amount=int(amount[0])
@@ -320,8 +296,6 @@ class Reward():
         stat.append(None)
       stat.append(0)
       stat.append(info[16])
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       cur.execute(f"INSERT INTO '''{self.id}_weapon''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
       con.commit()
       return info[0]
@@ -338,8 +312,6 @@ class Dungeon():
     self.dic=dic
     self.floor=floor
   def go(self,):
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     if self.id in self.dic and self.dic[self.id]:
       return self.dic,"이미 던전에 있어요!"
     self.dic[self.id]=True
@@ -350,8 +322,6 @@ class Dungeon():
       return self.dic,"몬스터를 만나지 못했어요!"
     return self.dic,None
   def stat(self):
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     cur.execute(f"SELECT COUNT(*) FROM enemy WHERE floor = {self.floor}")
     check=cur.fetchone()
     r=random.randint(0,int(check[0])-1)
@@ -359,8 +329,6 @@ class Dungeon():
     enemy=cur.fetchone()
     cur.execute(f"SELECT str,hp,name,mp FROM user_stat WHERE id = ?",(self.id,))
     stat=cur.fetchone()
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     cur.execute(f"SELECT SUM(str),SUM(hp),SUM(mp) FROM '''{self.id}_wear''' WHERE wear=1 ")
     item=cur.fetchone()
     if not item[0] and not item[1] and not item[1]:
@@ -384,16 +352,12 @@ class ItemInventory():
     self.id = id
     self.value = value
   def item(self):
-    con=sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     cur.execute(f"SELECT * FROM '''{self.id}{self.value}'''")
     items=cur.fetchall()
     return items
   def display(self,item):
     item=list(item)
     if self.value=="_weapon":
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       cur.execute(f"SELECT * FROM '''{self.id}{self.value}''' WHERE wear = 1")
       wearing = cur.fetchone()
       gap=["" for _ in range(13)]
@@ -420,8 +384,6 @@ class ItemInventory():
       item.pop()
       item.insert(6,"\u200b")
     elif self.value=="_wear": 
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       cur.execute(f"SELECT * FROM '''{self.id}{self.value}''' WHERE wear = 1 AND part = {item[15]}")
       wearing = cur.fetchone()
       gap=["" for _ in range(15)]

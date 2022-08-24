@@ -6,12 +6,14 @@ import discord
 import os
 import datetime
 import random
-import sqlite3
+import pymysql
 import asyncio
 from discord import Colour, Interaction, ui,app_commands,Button,ButtonStyle,SelectMenu,SelectOption
 from discord.ext import commands
 from renewal_class import *
 from skill import Skill, skillModify
+
+
 KST=datetime.timezone(datetime.timedelta(hours=9))
 class MyClient(discord.Client):
   @tasks.loop(time=datetime.time(hour=8,minute=0,second=0,tzinfo=KST))
@@ -37,7 +39,8 @@ class MyClient(discord.Client):
         for g in items:
             await client.change_presence(status = discord.Status.online, activity = discord.Game(g))
             await asyncio.sleep(5)
-  
+con=pymysql.connect(user=['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
+cur = con.cursor()
 class reportModal(ui.Modal, title="건의"):
   answer=ui.TextInput(
         custom_id="생성",
@@ -48,8 +51,6 @@ class reportModal(ui.Modal, title="건의"):
         max_length=500,
       )  
   async def on_submit(self, interaction: discord.Interaction):
-    con=sqlite3.connect(r'./rpg.db')
-    cur=con.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS report(value TEXT,user TEXT)")
     cur.execute("INSERT INTO report VALUES(?,?)",(self.answer.value,interaction.user.id,))
     con.commit()
@@ -87,8 +88,7 @@ class Inventory(enum.Enum):
 intents= discord.Intents.all()
 client = MyClient(intents=intents)
 tree = app_commands.CommandTree(client)
-con = sqlite3.connect(r"./rpg.db",isolation_level=None)
-cur = con.cursor()
+
 
 
 GUILD_ID=955246008923742209
@@ -361,8 +361,6 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
 #/강화소 <장비>
 @tree.command(guild= discord.Object(id=955246008923742209),name="강화소", description="착용중인 아이템을 강화합니다.")
 async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
-  con=sqlite3.connect(r"./item.db",isolation_level=None)
-  cur=con.cursor()
   if 장비.value != 0:
     cur.execute(f"SELECT * FROM '''{interaction.user.id}_wear''' WHERE part = ? AND wear = ? ",(장비.value,1,))
   else:
@@ -392,8 +390,6 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
       amount=0
     else:
       amount=amount[0]
-    con = sqlite3.connect(r"./rpg.db",isolation_level=None)
-    cur = con.cursor()
     cur.execute("SELECT money FROM user_data WHERE id = ?",(interaction.user.id,))
     gold= cur.fetchone()[0]
     if check[2]=="F": 
@@ -415,11 +411,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     select.options.append(SelectOption(label="마나",value="mp",description="캐릭터의 추가 마나"))
     view.add_item(select)
     async def select_callback(interaction:discord.Interaction):
-      con=sqlite3.connect(r"./rpg.db",isolation_level=None)
-      cur=con.cursor()
       cur.execute(f"UPDATE user_data SET money = money -{a} WHERE id = ?",(interaction.user.id,))
-      con=sqlite3.connect(r"./item.db",isolation_level=None)
-      cur=con.cursor()
       cur.execute(f"UPDATE '''{interaction.user.id}_etc''' SET item_amount=item_amount - {int(a/50)} WHERE item_code=1")
       if rein.rein():
         r=random.randint(1,2)
@@ -490,8 +482,6 @@ async def dungeon(interaction:discord.Interaction,층:int):
   
   async def item_select_callback(interaction:discord.Interaction):
     embed= em()
-    con= sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM '''{interaction.user.id}_use''' WHERE item_code BETWEEN 1 AND 50 AND item_amount IS NOT 0")
     getItem=cur.fetchall()
     view = ui.View()
@@ -506,8 +496,6 @@ async def dungeon(interaction:discord.Interaction,층:int):
     await interaction.response.edit_message(embed=embed,view=view)
   async def skill_select_callback(interaction:discord.Interaction):
     embed= em()
-    con = sqlite3.connect(r"./item.db")
-    cur=con.cursor()
     cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM '''{interaction.user.id}_skill''' WHERE skill_level IS NOT 0 ")
     getSkill=cur.fetchall()
     view = ui.View()
@@ -527,8 +515,6 @@ async def dungeon(interaction:discord.Interaction,층:int):
         global damage
         global enemy
         enemy=list(enemy)
-        con=sqlite3.connect(r"./item.db")
-        cur=con.cursor()
         cur.execute(f"SELECT * FROM '''{interaction.user.id}_skill''' LIMIT {select.values[0]},1")
         info = cur.fetchone()
         premyhp=hp
@@ -687,8 +673,6 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     view.add_item(select)
 
     async def equip_callback(interaction:discord.Interaction):
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
       if inventory.value=="_weapon":
         cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 0 WHERE wear = 1")
         cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 1 WHERE rowid in (SELECT rowid FROM '''{interaction.user.id}{inventory.value}'''LIMIT {select.values[0]},1)")
@@ -709,8 +693,6 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       if inventory.value == "_weapon" or inventory.value=="_wear":
         for i in range(len(tem)):
           embed.add_field(name=info[i],value=f"{tem[i]} {gap[i] if gap[i] else empty}",inline=true[i])
-        con=sqlite3.connect(r'./rpg.db')
-        cur=con.cursor()
         cur.execute("SELECT level FROM user_data WHERE id = ?",(interaction.user.id,))
         level = cur.fetchone()[0]
         equip = ui.Button(style=ButtonStyle.green,emoji="🛡",disabled=(False if level>=tem[3] else True),label=("착용하기" if level>=tem[3] else "레벨이 낮습니다."))
@@ -753,8 +735,6 @@ async def 스킬(interaction:discord.Interaction):
     info[8]=Class(info[8]).display()
     info[6]=skillModify(interaction.user.id).effect(info[6])
     name=['스킬명',"",'마나소모량','체력소모량','스킬데미지','계수','효과','지속시간','직업',"",'스킬포인트','스킬레벨',"최대레벨","요구레벨"]
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     cur.execute("SELECT skill_point FROM user_stat WHERE id = ?",(interaction.user.id,))
     point=cur.fetchone()[0]
     for i in range(len(info)):
@@ -793,17 +773,12 @@ async def Cut(interaction:discord.Interaction,sure:bool):
     button=ui.Button(label="네.",style=ButtonStyle.danger)
     view.add_item(button)
     async def button_callback(interaction:discord.Interaction):
-      con=sqlite3.connect(r'./rpg.db')
-      cur=con.cursor()      
       cur.execute("DELETE FROM user_stat WHERE id = ? ",(interaction.user.id,),)
       cur.execute("DELETE FROM user_data WHERE id = ? ",(interaction.user.id,),)
       li=["weapon","wear","etc","use","cash"]
       for i in li:
         cur.execute(f"DELETE FROM trade_{i} WHERE id = ?",(interaction.user.id,))
       con.commit()  
-      con=sqlite3.connect(r"./item.db")
-      cur=con.cursor()
-
       li.append("skill")
       for i in li:
         cur.execute(f"DROP TABLE '''{interaction.user.id}_{i}'''")
@@ -821,8 +796,6 @@ async def Command(interaction:discord.Interaction, code:str):
     #test2=Reward(2,interaction.user.id,0,0)  
     #default=Default(interaction.user.id)
     #default.isItem()
-    con=sqlite3.connect(r"./rpg.db")
-    cur=con.cursor()
     #cur.execute("INSERT INTO etc VALUES(?,?,?,?,?,?)",(2,'강화의 서',0,50,0,'https://cdn.discordapp.com/attachments/884063587344207904/949085121158447155/60bff62ca078a941.png'))
     #cur.execute("CREATE TABLE IF NOT EXISTS skill(skill_name TEXT, skill_id INTEGER, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER)")
     #cur.execute("INSERT INTO skill VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",("찌르기",1,20,0,50,1,'blood',2,0,None,1,0,1))
