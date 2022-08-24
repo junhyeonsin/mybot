@@ -256,6 +256,7 @@ async def register(interaction: discord.Interaction, 닉네임: str):
   embed.add_field(name="닉네임",value=닉네임)
   cur.execute("INSERT INTO user_data VALUES(%s, %s, %s, %s, %s , %s, %s)", (닉네임,interaction.user.id, 1, 0, 500,0,str(interaction.user.display_avatar.url)))            
   cur.execute("INSERT INTO user_stat VALUES(%s, %s, %s, %s, %s ,%s ,%s, %s, %s, %s)",(닉네임,interaction.user.id,1,1,1,1,1,0,3,1))
+  con.commit()
   inventory=Default(interaction.user.id)
   inventory.isInventory()
   inventory.isItem()
@@ -786,7 +787,7 @@ async def Cut(interaction:discord.Interaction,sure:bool):
       con.commit()
       await interaction.response.edit_message(content="삭제되었습니다",view=None)
     button.callback=button_callback
-    await interaction.response.send_message(content="확실합니까%s",view=view,ephemeral=True) 
+    await interaction.response.send_message(content="확실합니까?",view=view,ephemeral=True) 
 @tree.command(name="건의하기", description="건의를 할수있습니다.")
 async def modal(interaction:discord.Interaction):
   await interaction.response.send_modal(reportModal())
