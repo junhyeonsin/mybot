@@ -130,7 +130,7 @@ class Default():
 
     def etc():
 
-      cur.execute(f"SELECT * FROM etc")
+      cur.execute(f"SELECT * FROM `etc`")
       data=cur.fetchall()
 
       cur.execute(f"SELECT item_code FROM `{self.id}_etc`")
@@ -145,7 +145,7 @@ class Default():
       cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(?,?,?,?,?,?)",(data))
       con.commit()
     def use():
-      cur.execute(f"SELECT * FROM use")
+      cur.execute(f"SELECT * FROM `use`")
       data=cur.fetchall()
       cur.execute(f"SELECT item_code FROM `{self.id}_use`")
       primarykey=cur.fetchall()
