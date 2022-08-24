@@ -676,10 +676,10 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     async def equip_callback(interaction:discord.Interaction):
       if inventory.value=="_weapon":
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE rowid in (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
       elif inventory.value=="_wear":  
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][15]}")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE rowid in (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
       con.commit()
       embed.set_footer(text="성공적으로 아이템을 착용했습니다.")
       view=ui.View()
