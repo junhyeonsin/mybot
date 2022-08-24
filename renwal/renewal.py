@@ -355,7 +355,8 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
   else: 
     title="스테이터스"
     name=f"**{스텟.name}**을 **+{포인트}** 만큼 올렸습니다." 
-    cur.execute(f"UPDATE user_stat SET {스텟.value} = {스텟.value}+{포인트},  stat_point=stat_point-{포인트}  WHERE id = %s",(interaction.user.id))    
+    cur.execute(f"UPDATE user_stat SET {스텟.value} = {스텟.value}+{포인트},  stat_point=stat_point-{포인트}  WHERE id = %s",(interaction.user.id))   
+    con.commit() 
   embed=discord.Embed(title=title)
   embed.add_field(name=name,value='\u200b')
   await interaction.response.send_message(embed=embed,ephemeral=True)
@@ -415,6 +416,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     async def select_callback(interaction:discord.Interaction):
       cur.execute(f"UPDATE user_data SET money = money -{a} WHERE id = %s",(interaction.user.id))
       cur.execute(f"UPDATE `{interaction.user.id}_etc` SET item_amount=item_amount - {int(a/50)} WHERE item_code=1")
+      con.commit()
       if rein.rein():
         r=random.randint(1,2)
         title="강화성공"
@@ -426,6 +428,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
           cur.execute(f"UPDATE `{interaction.user.id}_weapon` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1")
         else:
           cur.execute(f"UPDATE `{interaction.user.id}_wear` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1 AND part= %s",(장비.value))
+        con.commit()
       else:
         title="강화실패"
         name="아쉽지만 다음기회에"
