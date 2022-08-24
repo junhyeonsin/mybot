@@ -142,7 +142,7 @@ class Default():
             del data[j]
           else:
             j+=1
-      cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(?,?,?,?,?,?)",(data))
+      cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(?,?,?,?,?,?)",(data,))
       con.commit()
     def use():
       cur.execute(f"SELECT * FROM `use`")
@@ -156,7 +156,7 @@ class Default():
             del data[j]
           else:
             j+=1
-      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(?,?,?,?,?,?)",(data))
+      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(?,?,?,?,?,?)",(data,))
       con.commit()
     use()
     etc()
