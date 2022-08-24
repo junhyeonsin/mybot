@@ -299,7 +299,6 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
         exp = Exp(check[i],check[i-1]*30*int(check[i-1]/15+1))
         block_id=["0_","1_","2_","3_","4_","5_","6_","7_","8_","9_","10","9_5"]
         block_list=[discord.utils.get(guild.emojis,name=i) for i in block_id]
-        print(block_list)
         embed.add_field(name=f"경험치 {exp.string()} ({round(exp.percent(),1)}%)",value=exp.block(block_list),inline=False)
       elif i==4:
         transfer=Class(check[i])

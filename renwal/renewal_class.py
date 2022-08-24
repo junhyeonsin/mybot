@@ -28,6 +28,7 @@ class Exp():
     while cnt<10:
       cnt+=1
       string+=str(list[0])
+    print(string)
     return string
 
 #클래스명
@@ -143,8 +144,7 @@ class Default():
           else:
             j+=1
       print(data)
-      data=tuple(data)
-      cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(%s,%s,%s,%s,%s,%s)",(data,))
+      cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(%s,%s,%s,%s,%s,%s)",data)
       con.commit()
     def use():
       cur.execute(f"SELECT * FROM `use`")
@@ -160,8 +160,7 @@ class Default():
           else:
             j+=1
       print(data)
-      data=tuple(data)
-      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",(data))
+      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",data)
       con.commit()
     use()
     etc()
