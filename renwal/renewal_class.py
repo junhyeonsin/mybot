@@ -156,7 +156,7 @@ class Default():
             del data[j]
           else:
             j+=1
-      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",(data,))
+      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",(data))
       con.commit()
     use()
     etc()

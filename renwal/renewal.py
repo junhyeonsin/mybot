@@ -275,7 +275,7 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
   async def button_callback(interaction:discord.Interaction):
     embed=discord.Embed(title="스테이터스")
     embed.set_thumbnail(url=유저.avatar)
-    cur.execute("SELECT name,str,dex,int,luck,hp,mp,stat_point,skill_point FROM user_stat WHERE id =%s",(유저.id))
+    cur.execute("SELECT name,str,dex,`int`,luck,hp,mp,stat_point,skill_point FROM user_stat WHERE id =%s",(유저.id))
     check=cur.fetchone()
     stat=['닉네임','힘','민첩','지능','행운','체력',"마나",'남은 스테이터스 포인트','남은 스킬 포인트']
     true=[False,True,True,True,True,True,True,False,False]
