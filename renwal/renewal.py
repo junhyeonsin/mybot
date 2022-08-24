@@ -52,7 +52,7 @@ class reportModal(ui.Modal, title="건의"):
       )  
   async def on_submit(self, interaction: discord.Interaction):
     cur.execute("CREATE TABLE IF NOT EXISTS report(value TEXT,user TEXT)")
-    cur.execute("INSERT INTO report VALUES(?,?)",(self.answer.value,interaction.user.id,))
+    cur.execute("INSERT INTO report VALUES(?,?)",(self.answer.value,interaction.user.id))
     con.commit()
     await interaction.response.send_message("건의사항이 접수되었습니다.",ephemeral=True)
 class ReinforceItem(enum.Enum):
@@ -242,10 +242,10 @@ async def register(interaction: discord.Interaction, 닉네임: str):
   value=""
   if len(닉네임) > 10 and len(닉네임)<=2:
     value="아이디 길이는 2~10자 사이로 정해주세요."
-  cur.execute("SELECT * FROM user_stat WHERE id = ?",(interaction.user.id,))
+  cur.execute("SELECT * FROM user_stat WHERE id = ?",(interaction.user.id))
   if cur.fetchone():
     value="이미 계정이 있습니다."
-  cur.execute("SELECT * FROM user_stat WHERE name = ?",(닉네임,))
+  cur.execute("SELECT * FROM user_stat WHERE name = ?",(닉네임))
   if cur.fetchone():
     value="이미 있는 닉네임 입니다."
   
@@ -254,7 +254,7 @@ async def register(interaction: discord.Interaction, 닉네임: str):
     return await interaction.response.send_message(embed=embed,ephemeral=True)
   embed= discord.Embed(title="아이디 생성")
   embed.add_field(name="닉네임",value=닉네임)
-  cur.execute("INSERT INTO user_data VALUES(?, ?, ?, ?, ? , ?, ?)", (닉네임,interaction.user.id, 1, 0, 500,0,str(interaction.user.display_avatar.url),))            
+  cur.execute("INSERT INTO user_data VALUES(?, ?, ?, ?, ? , ?, ?)", (닉네임,interaction.user.id, 1, 0, 500,0,str(interaction.user.display_avatar.url)))            
   cur.execute("INSERT INTO user_stat VALUES(?, ?, ?, ?, ? ,? ,?, ?, ?, ?)",(닉네임,interaction.user.id,1,1,1,1,1,0,3,1))
   inventory=Default(interaction.user.id)
   inventory.isInventory()
@@ -266,7 +266,7 @@ async def register(interaction: discord.Interaction, 닉네임: str):
 #/정보 <유저>  
 @tree.command(guild= discord.Object(id=955246008923742209),name="정보", description="캐릭터 정보를 확인합니다.")
 async def info(interaction:discord.Interaction, 유저 : discord.Member):
-  cur.execute("SELECT * FROM user_data WHERE id = ?",(유저.id,))
+  cur.execute("SELECT * FROM user_data WHERE id = ?",(유저.id))
   check=cur.fetchone()
   if not check:
     embed= discord.Embed(title="에러")
@@ -275,7 +275,7 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
   async def button_callback(interaction:discord.Interaction):
     embed=discord.Embed(title="스테이터스")
     embed.set_thumbnail(url=유저.avatar)
-    cur.execute("SELECT name,str,dex,int,luck,hp,mp,stat_point,skill_point FROM user_stat WHERE id =?",(유저.id,))
+    cur.execute("SELECT name,str,dex,int,luck,hp,mp,stat_point,skill_point FROM user_stat WHERE id =?",(유저.id))
     check=cur.fetchone()
     stat=['닉네임','힘','민첩','지능','행운','체력',"마나",'남은 스테이터스 포인트','남은 스킬 포인트']
     true=[False,True,True,True,True,True,True,False,False]
@@ -289,7 +289,7 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
   async def info_callback(interaction:discord.Interaction):
     embed=discord.Embed(title="정보",color=유저.color)
     embed.set_thumbnail(url=유저.avatar)
-    cur.execute("SELECT name,level,exp,money,class,url FROM user_data WHERE id = ?",(유저.id,))
+    cur.execute("SELECT name,level,exp,money,class,url FROM user_data WHERE id = ?",(유저.id))
     check = cur.fetchone()
     display=["닉네임","레벨","","돈","",""]
     for i in range(len(check)):
@@ -339,7 +339,7 @@ async def dungeonreset(interaction:Interaction):
 #/스텟 <스텟> <포인트>
 @tree.command(guild= discord.Object(id=955246008923742209),name="스텟", description="스테이터스를 올립니다.")
 async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int ):
-  cur.execute("SELECT stat_point,hp FROM user_stat WHERE id = ?",(interaction.user.id,))
+  cur.execute("SELECT stat_point,hp FROM user_stat WHERE id = ?",(interaction.user.id))
   check=cur.fetchone()
   if 포인트 > check[0]:
     title="스테이터스 에러"
@@ -353,7 +353,7 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
   else: 
     title="스테이터스"
     name=f"**{스텟.name}**을 **+{포인트}** 만큼 올렸습니다." 
-    cur.execute(f"UPDATE user_stat SET {스텟.value} = {스텟.value}+{포인트},  stat_point=stat_point-{포인트}  WHERE id = ?",(interaction.user.id,))    
+    cur.execute(f"UPDATE user_stat SET {스텟.value} = {스텟.value}+{포인트},  stat_point=stat_point-{포인트}  WHERE id = ?",(interaction.user.id))    
   embed=discord.Embed(title=title)
   embed.add_field(name=name,value='\u200b')
   await interaction.response.send_message(embed=embed,ephemeral=True)
@@ -362,9 +362,9 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
 @tree.command(guild= discord.Object(id=955246008923742209),name="강화소", description="착용중인 아이템을 강화합니다.")
 async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
   if 장비.value != 0:
-    cur.execute(f"SELECT * FROM `{interaction.user.id}_wear` WHERE part = ? AND wear = ? ",(장비.value,1,))
+    cur.execute(f"SELECT * FROM `{interaction.user.id}_wear` WHERE part = ? AND wear = ? ",(장비.value,1))
   else:
-    cur.execute(f"SELECT * FROM `{interaction.user.id}_weapon` WHERE wear = ?",(1,))
+    cur.execute(f"SELECT * FROM `{interaction.user.id}_weapon` WHERE wear = ?",(1))
   check =cur.fetchone()
   if not check:
     embed=discord.Embed(title="강화 에러")
@@ -384,13 +384,13 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
       embed.add_field(name="체력",value=check[7])
       embed.set_thumbnail(url=check[16])
     view = ui.View()
-    cur.execute(f"SELECT item_amount FROM `{interaction.user.id}_etc` WHERE item_code = ?",(1,))
+    cur.execute(f"SELECT item_amount FROM `{interaction.user.id}_etc` WHERE item_code = ?",(1))
     amount = cur.fetchone()
     if amount==None:
       amount=0
     else:
       amount=amount[0]
-    cur.execute("SELECT money FROM user_data WHERE id = ?",(interaction.user.id,))
+    cur.execute("SELECT money FROM user_data WHERE id = ?",(interaction.user.id))
     gold= cur.fetchone()[0]
     if check[2]=="F": 
       return await interaction.response.send_message("강화가 불가능한 아이템입니다.",ephemeral=True)
@@ -411,7 +411,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     select.options.append(SelectOption(label="마나",value="mp",description="캐릭터의 추가 마나"))
     view.add_item(select)
     async def select_callback(interaction:discord.Interaction):
-      cur.execute(f"UPDATE user_data SET money = money -{a} WHERE id = ?",(interaction.user.id,))
+      cur.execute(f"UPDATE user_data SET money = money -{a} WHERE id = ?",(interaction.user.id))
       cur.execute(f"UPDATE `{interaction.user.id}_etc` SET item_amount=item_amount - {int(a/50)} WHERE item_code=1")
       if rein.rein():
         r=random.randint(1,2)
@@ -423,7 +423,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
         if 장비.value==0:
           cur.execute(f"UPDATE `{interaction.user.id}_weapon` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1")
         else:
-          cur.execute(f"UPDATE `{interaction.user.id}_wear` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1 AND part= ?",(장비.value,))
+          cur.execute(f"UPDATE `{interaction.user.id}_wear` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1 AND part= ?",(장비.value))
       else:
         title="강화실패"
         name="아쉽지만 다음기회에"
@@ -468,7 +468,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
   def vi():
     view=ui.View()
     attack=ui.Button(style=discord.ButtonStyle.green,emoji="⚔",label="공격하기")
-    use=ui.Button(style=discord.ButtonStyle.gray,emoji="💊",label="아이템",)
+    use=ui.Button(style=discord.ButtonStyle.gray,emoji="💊",label="아이템")
     guard=ui.Button(style=discord.ButtonStyle.gray,emoji="🔮",label="스킬사용",disabled=skill.canskill())
     run=ui.Button(style=discord.ButtonStyle.red,emoji="👟",label="도망가기",disabled=True)
     view.add_item(attack)
@@ -693,7 +693,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       if inventory.value == "_weapon" or inventory.value=="_wear":
         for i in range(len(tem)):
           embed.add_field(name=info[i],value=f"{tem[i]} {gap[i] if gap[i] else empty}",inline=true[i])
-        cur.execute("SELECT level FROM user_data WHERE id = ?",(interaction.user.id,))
+        cur.execute("SELECT level FROM user_data WHERE id = ?",(interaction.user.id))
         level = cur.fetchone()[0]
         equip = ui.Button(style=ButtonStyle.green,emoji="🛡",disabled=(False if level>=tem[3] else True),label=("착용하기" if level>=tem[3] else "레벨이 낮습니다."))
         back = ui.Button(style=ButtonStyle.primary,emoji="↩",label="돌아가기")
@@ -735,7 +735,7 @@ async def 스킬(interaction:discord.Interaction):
     info[8]=Class(info[8]).display()
     info[6]=skillModify(interaction.user.id).effect(info[6])
     name=['스킬명',"",'마나소모량','체력소모량','스킬데미지','계수','효과','지속시간','직업',"",'스킬포인트','스킬레벨',"최대레벨","요구레벨"]
-    cur.execute("SELECT skill_point FROM user_stat WHERE id = ?",(interaction.user.id,))
+    cur.execute("SELECT skill_point FROM user_stat WHERE id = ?",(interaction.user.id))
     point=cur.fetchone()[0]
     for i in range(len(info)):
       if i == 6:
@@ -773,11 +773,11 @@ async def Cut(interaction:discord.Interaction,sure:bool):
     button=ui.Button(label="네.",style=ButtonStyle.danger)
     view.add_item(button)
     async def button_callback(interaction:discord.Interaction):
-      cur.execute("DELETE FROM user_stat WHERE id = ? ",(interaction.user.id,))
-      cur.execute("DELETE FROM user_data WHERE id = ? ",(interaction.user.id,))
+      cur.execute("DELETE FROM user_stat WHERE id = ? ",(interaction.user.id))
+      cur.execute("DELETE FROM user_data WHERE id = ? ",(interaction.user.id))
       li=["weapon","wear","etc","use","cash"]
       for i in li:
-        cur.execute(f"DELETE FROM trade_{i} WHERE id = ?",(interaction.user.id,))
+        cur.execute(f"DELETE FROM trade_{i} WHERE id = ?",(interaction.user.id))
       con.commit()  
       li.append("skill")
       for i in li:
