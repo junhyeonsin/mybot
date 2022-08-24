@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pymysql
 import os
-from renewal import db_info
 con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
 cur = con.cursor()
 class Skill():
