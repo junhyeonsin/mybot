@@ -133,7 +133,7 @@ class Default():
       cur.execute(f"SELECT * FROM etc")
       data=cur.fetchall()
 
-      cur.execute(f"SELECT item_code FROM '''{self.id}_etc'''")
+      cur.execute(f"SELECT item_code FROM `{self.id}_etc`")
       primarykey=cur.fetchall()
       if primarykey:
         for i in range(len(primarykey)):
@@ -142,12 +142,12 @@ class Default():
             del data[j]
           else:
             j+=1
-      cur.executemany(f"INSERT INTO '''{self.id}_etc''' VALUES(?,?,?,?,?,?)",(data))
+      cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(?,?,?,?,?,?)",(data))
       con.commit()
     def use():
       cur.execute(f"SELECT * FROM use")
       data=cur.fetchall()
-      cur.execute(f"SELECT item_code FROM '''{self.id}_use'''")
+      cur.execute(f"SELECT item_code FROM `{self.id}_use`")
       primarykey=cur.fetchall()
       if primarykey:
         for i in range(len(primarykey)):
@@ -156,7 +156,7 @@ class Default():
             del data[j]
           else:
             j+=1
-      cur.executemany(f"INSERT INTO '''{self.id}_use''' VALUES(?,?,?,?,?,?)",(data))
+      cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(?,?,?,?,?,?)",(data))
       con.commit()
     use()
     etc()
@@ -164,12 +164,12 @@ class Default():
   def isInventory(self):
     li=['_use','_etc','_cash']
     for i in li:
-      cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}{i}'''(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
-    cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}_weapon'''(item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}_wear'''(item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS '''{self.id}_skill'''(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
+      cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}{i}`(`item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(`item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(`item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(`skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
-    cur.execute(f"INSERT INTO '''{self.id}_weapon''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None,))
+    cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None,))
     con.commit()
 
   def isLevel(self):
@@ -214,8 +214,8 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
-      cur.execute(f"UPDATE '''{self.id}_etc''' SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
-      cur.execute(f"SELECT item_name FROM '''{self.id}_etc''' WHERE item_code = ?",(code[i],))
+      cur.execute(f"UPDATE `{self.id}_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
+      cur.execute(f"SELECT item_name FROM `{self.id}_etc` WHERE item_code = ?",(code[i],))
       name.append(cur.fetchone()[0])
     con.commit()
     return name,rand
@@ -237,8 +237,8 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
-      cur.execute(f"UPDATE '''{self.id}_use''' SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
-      cur.execute(f"SELECT item_name FROM '''{self.id}_use''' WHERE item_code = ?",(code[i],))
+      cur.execute(f"UPDATE `{self.id}_use` SET item_amount=item_amount+{rand[i]} WHERE item_code=?",(code[i],))
+      cur.execute(f"SELECT item_name FROM `{self.id}_use` WHERE item_code = ?",(code[i],))
       name.append(cur.fetchone()[0])
     con.commit()
     return name,rand
@@ -268,7 +268,7 @@ class Reward():
       stat.append(0)
       stat.append(info[16])   
       stat.append(info[18])
-      cur.execute(f"INSERT INTO '''{self.id}_wear''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
+      cur.execute(f"INSERT INTO `{self.id}_wear` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
       con.commit()
       return info[0]
     return None
@@ -296,7 +296,7 @@ class Reward():
         stat.append(None)
       stat.append(0)
       stat.append(info[16])
-      cur.execute(f"INSERT INTO '''{self.id}_weapon''' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
+      cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(stat))  
       con.commit()
       return info[0]
     return None
@@ -329,11 +329,11 @@ class Dungeon():
     enemy=cur.fetchone()
     cur.execute(f"SELECT str,hp,name,mp FROM user_stat WHERE id = ?",(self.id,))
     stat=cur.fetchone()
-    cur.execute(f"SELECT SUM(str),SUM(hp),SUM(mp) FROM '''{self.id}_wear''' WHERE wear=1 ")
+    cur.execute(f"SELECT SUM(str),SUM(hp),SUM(mp) FROM `{self.id}_wear` WHERE wear=1 ")
     item=cur.fetchone()
     if not item[0] and not item[1] and not item[1]:
       item = (0,0,0)
-    cur.execute(f"SELECT str,damage,mp FROM '''{self.id}_weapon''' WHERE wear = 1")
+    cur.execute(f"SELECT str,damage,mp FROM `{self.id}_weapon` WHERE wear = 1")
     weapon=cur.fetchone()
     if not weapon:
       weapon = (0,1,0)
@@ -352,13 +352,13 @@ class ItemInventory():
     self.id = id
     self.value = value
   def item(self):
-    cur.execute(f"SELECT * FROM '''{self.id}{self.value}'''")
+    cur.execute(f"SELECT * FROM `{self.id}{self.value}`")
     items=cur.fetchall()
     return items
   def display(self,item):
     item=list(item)
     if self.value=="_weapon":
-      cur.execute(f"SELECT * FROM '''{self.id}{self.value}''' WHERE wear = 1")
+      cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1")
       wearing = cur.fetchone()
       gap=["" for _ in range(13)]
       if wearing:
@@ -384,7 +384,7 @@ class ItemInventory():
       item.pop()
       item.insert(6,"\u200b")
     elif self.value=="_wear": 
-      cur.execute(f"SELECT * FROM '''{self.id}{self.value}''' WHERE wear = 1 AND part = {item[15]}")
+      cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1 AND part = {item[15]}")
       wearing = cur.fetchone()
       gap=["" for _ in range(15)]
       if wearing:
