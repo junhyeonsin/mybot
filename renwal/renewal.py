@@ -619,7 +619,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
       rewardWear=reward.wear()
       defualt=Default(interaction.user.id)
       level=defualt.isLevel()
-      con.comiit()
+      con.commit()
       if level:
         embed.add_field(name=f"**{level} 레벨** 달성!",value="\u200b",inline=False)
 
