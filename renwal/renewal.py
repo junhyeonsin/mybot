@@ -362,9 +362,9 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
 @tree.command(guild= discord.Object(id=955246008923742209),name="강화소", description="착용중인 아이템을 강화합니다.")
 async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
   if 장비.value != 0:
-    cur.execute(f"SELECT * FROM '''{interaction.user.id}_wear''' WHERE part = ? AND wear = ? ",(장비.value,1,))
+    cur.execute(f"SELECT * FROM `{interaction.user.id}_wear` WHERE part = ? AND wear = ? ",(장비.value,1,))
   else:
-    cur.execute(f"SELECT * FROM '''{interaction.user.id}_weapon''' WHERE wear = ?",(1,))
+    cur.execute(f"SELECT * FROM `{interaction.user.id}_weapon` WHERE wear = ?",(1,))
   check =cur.fetchone()
   if not check:
     embed=discord.Embed(title="강화 에러")
@@ -384,7 +384,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
       embed.add_field(name="체력",value=check[7])
       embed.set_thumbnail(url=check[16])
     view = ui.View()
-    cur.execute(f"SELECT item_amount FROM '''{interaction.user.id}_etc''' WHERE item_code = ?",(1,))
+    cur.execute(f"SELECT item_amount FROM `{interaction.user.id}_etc` WHERE item_code = ?",(1,))
     amount = cur.fetchone()
     if amount==None:
       amount=0
@@ -412,7 +412,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     view.add_item(select)
     async def select_callback(interaction:discord.Interaction):
       cur.execute(f"UPDATE user_data SET money = money -{a} WHERE id = ?",(interaction.user.id,))
-      cur.execute(f"UPDATE '''{interaction.user.id}_etc''' SET item_amount=item_amount - {int(a/50)} WHERE item_code=1")
+      cur.execute(f"UPDATE `{interaction.user.id}_etc` SET item_amount=item_amount - {int(a/50)} WHERE item_code=1")
       if rein.rein():
         r=random.randint(1,2)
         title="강화성공"
@@ -421,9 +421,9 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
         mode=Modify(select.values[0])
         name=f"{mode.statModify()}이 +{r} 올랐다."
         if 장비.value==0:
-          cur.execute(f"UPDATE '''{interaction.user.id}_weapon''' SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1")
+          cur.execute(f"UPDATE `{interaction.user.id}_weapon` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1")
         else:
-          cur.execute(f"UPDATE '''{interaction.user.id}_wear''' SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1 AND part= ?",(장비.value,))
+          cur.execute(f"UPDATE `{interaction.user.id}_wear` SET upgrade = upgrade+1, {select.values[0]}={select.values[0]}+{r} WHERE wear = 1 AND part= ?",(장비.value,))
       else:
         title="강화실패"
         name="아쉽지만 다음기회에"
@@ -482,7 +482,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
   
   async def item_select_callback(interaction:discord.Interaction):
     embed= em()
-    cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM '''{interaction.user.id}_use''' WHERE item_code BETWEEN 1 AND 50 AND item_amount IS NOT 0")
+    cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM `{interaction.user.id}_use` WHERE item_code BETWEEN 1 AND 50 AND item_amount IS NOT 0")
     getItem=cur.fetchall()
     view = ui.View()
     select = ui.Select(placeholder="아이템 사용",options=[SelectOption(label="돌아가기",value=-1)])
@@ -496,7 +496,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
     await interaction.response.edit_message(embed=embed,view=view)
   async def skill_select_callback(interaction:discord.Interaction):
     embed= em()
-    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM '''{interaction.user.id}_skill''' WHERE skill_level IS NOT 0 ")
+    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{interaction.user.id}_skill` WHERE skill_level IS NOT 0 ")
     getSkill=cur.fetchall()
     view = ui.View()
     select= ui.Select(placeholder="스킬 사용",options=[SelectOption(label="돌아가기",value=-1)])
@@ -515,7 +515,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
         global damage
         global enemy
         enemy=list(enemy)
-        cur.execute(f"SELECT * FROM '''{interaction.user.id}_skill''' LIMIT {select.values[0]},1")
+        cur.execute(f"SELECT * FROM `{interaction.user.id}_skill` LIMIT {select.values[0]},1")
         info = cur.fetchone()
         premyhp=hp
         premydamage=damage.display()
@@ -674,11 +674,11 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
 
     async def equip_callback(interaction:discord.Interaction):
       if inventory.value=="_weapon":
-        cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 0 WHERE wear = 1")
-        cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 1 WHERE rowid in (SELECT rowid FROM '''{interaction.user.id}{inventory.value}'''LIMIT {select.values[0]},1)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE rowid in (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
       elif inventory.value=="_wear":  
-        cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][15]}")
-        cur.execute(f"UPDATE '''{interaction.user.id}{inventory.value}''' SET wear = 1 WHERE rowid in (SELECT rowid FROM '''{interaction.user.id}{inventory.value}'''LIMIT {select.values[0]},1)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][15]}")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE rowid in (SELECT rowid FROM `{interaction.user.id}{inventory.value}`LIMIT {select.values[0]},1)")
       con.commit()
       embed.set_footer(text="성공적으로 아이템을 착용했습니다.")
       view=ui.View()
@@ -781,7 +781,7 @@ async def Cut(interaction:discord.Interaction,sure:bool):
       con.commit()  
       li.append("skill")
       for i in li:
-        cur.execute(f"DROP TABLE '''{interaction.user.id}_{i}'''")
+        cur.execute(f"DROP TABLE `{interaction.user.id}_{i}`")
       con.commit()
       await interaction.response.edit_message(content="삭제되었습니다",view=None)
     button.callback=button_callback

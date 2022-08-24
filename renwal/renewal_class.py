@@ -4,7 +4,7 @@ import random
 import pymysql
 import discord
 import os
-con=pymysql.connect(user=['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
+con=pymysql.connect(user=['user'],password=os.environ['password'],host=os.environ['host'],charset="utf8",database=os.environ['database'])
 cur = con.cursor()
 #경험치바
 class Exp():
