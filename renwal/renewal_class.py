@@ -16,6 +16,7 @@ class Exp():
   def percent(self):
     return (self.now/self.max)*100
   def block(self,list:list):
+    print(list[0].id)
     string=""
     cnt=1
     for _ in range(int(self.percent()/10)):

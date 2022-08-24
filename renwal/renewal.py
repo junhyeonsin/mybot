@@ -296,6 +296,7 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
       if i==2:
         guild= client.get_guild(955246008923742209)
         print(int(check[i-1]/15))
+        print(client.get_emoji(1006826883607953459))
         exp = Exp(check[i],check[i-1]*30*int(check[i-1]/15+1))
         block_id=["0_","1_","2_","3_","4_","5_","6_","7_","8_","9_","10","9_5"]
         block_list=[discord.utils.get(guild.emojis,name=i) for i in block_id]
