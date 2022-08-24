@@ -45,7 +45,7 @@ class Reinforce():
     self.number=number
     self.rank=rank
   def require(self):
-    cur.execute(f"SELECT * FROM rein_money WHERE rank = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank,))
     money=cur.fetchone()[self.number+1]
     money=int(money)
     if self.gold < money or self.item < money/50:
@@ -53,7 +53,7 @@ class Reinforce():
     else:
       return False
   def rein(self):
-    cur.execute(f"SELECT * FROM rein_percent WHERE rank = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank,))
     percent=cur.fetchone()[self.number+1]
     percent=int(percent)
     r = random.randint(1,100)
@@ -62,10 +62,10 @@ class Reinforce():
     else:
       return False
   def display(self):
-    cur.execute(f"SELECT * FROM rein_money WHERE rank = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_money WHERE `rank` = ?",(self.rank,))
     money=cur.fetchone()[self.number+1]
     money=int(money)
-    cur.execute(f"SELECT * FROM rein_percent WHERE rank = ?",(self.rank,))
+    cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = ?",(self.rank,))
     percent=cur.fetchone()[self.number+1]
     percent = int(percent)
     return money,percent
@@ -165,8 +165,8 @@ class Default():
     li=['_use','_etc','_cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}{i}`(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_name TEXT , upgrade INTEGER, rank TEXT, level INTEGER, str INTEGER, dex INTEGER, int INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
     cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None,))
