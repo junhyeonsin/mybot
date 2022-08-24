@@ -186,8 +186,8 @@ class Default():
       exp-=(level*30)*(int(level/15+1))
       gap+=1
       level+=1
-    cur.execute(f"UPDATE user_data SET exp={exp}, level={level} WHERE id =%s",(self.id))
-    cur.execute(f"UPDATE user_stat SET stat_point=stat_point+{gap*3},skill_point=skill_point+{gap} WHERE id=%s",(self.id))
+    cur.execute(f"UPDATE user_data SET exp=`{exp}`, level=`{level}` WHERE id =%s",(self.id))
+    cur.execute(f"UPDATE user_stat SET stat_point=stat_point+`{gap*3}`,skill_point=skill_point+`{gap}` WHERE id=%s",(self.id))
     con.commit()
     if gap>0:
       return level
