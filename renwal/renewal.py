@@ -370,6 +370,8 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     embed.add_field(name="아이템을 착용하고 있지 않습니다.",value="\u200b")
     await interaction.response.send_message(embed=embed)
   else:
+    check=list(check)
+    check.pop(0)
     embed=discord.Embed(title="아이템 강화")
     itemInfo=['이름','강화','등급','레벨제한','힘','민첩','지능','행운','체력','마나']
     true =[True,True,True,False,True,True,True,True]
