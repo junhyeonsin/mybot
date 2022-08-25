@@ -213,13 +213,11 @@ async def shfflemusic(interaction:Interaction):
   global queue
   first=queue[0]
   random.shuffle(queue)
-  print(queue)
   for i in range(len(queue)):
     if queue[i]==first:
       del queue[i]
       break
   queue.insert(0,first)
-  print(queue)
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
   await interaction.delete_original_response()
@@ -296,8 +294,6 @@ async def info(interaction:discord.Interaction, 유저 : discord.Member):
     for i in range(len(check)):
       if i==2:
         guild= client.get_guild(955246008923742209)
-        print(int(check[i-1]/15))
-        print(client.get_emoji(1006826883607953459))
         exp = Exp(check[i],check[i-1]*30*int(check[i-1]/15+1))
         block_id=["0_","1_","2_","3_","4_","5_","6_","7_","8_","9_","10","9_5"]
         block_list=[discord.utils.get(guild.emojis,name=i) for i in block_id]
@@ -670,7 +666,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       a=["_weapon","_wear"]
       var="(착용중)"
       empty=""
-      options=[SelectOption(label=(f"[{item[i][0]}]+{item[i][2]} {item[i][1]} {var if item[i][13+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
+      options=[SelectOption(label=(f"[{item[i][0]}] +{item[i][2]} {item[i][1]} {var if item[i][13+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
     else:
       var="거래가능"
       val="거래불가"
@@ -681,10 +677,10 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     async def equip_callback(interaction:discord.Interaction):
       if inventory.value=="_weapon":
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid:={select.values[0]}) as init)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE item_code = {item[int(select.values[0])][0]}")
       elif inventory.value=="_wear":  
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][15]}")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid:={select.values[0]}) as init)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][16]}")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE item_code = {item[int(select.values[0])][0]}")
       con.commit()
       embed.set_footer(text="성공적으로 아이템을 착용했습니다.")
       view=ui.View()
