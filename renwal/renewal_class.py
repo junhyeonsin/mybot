@@ -358,12 +358,14 @@ class ItemInventory():
     return items
   def display(self,item):
     item=list(item)
+    item.pop(0)
     if self.value=="_weapon":
       cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1")
       wearing = cur.fetchone()
+      wearing = list(wearing)
+      wearing.pop(0)
       gap=["" for _ in range(13)]
       if wearing:
-        wearing = list(wearing)
         for i in range(4,13):
           if wearing[i] == None or item[i] == None:
             input=0
