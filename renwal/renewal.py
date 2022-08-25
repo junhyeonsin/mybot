@@ -694,7 +694,10 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       view = ui.View()
       if inventory.value == "_weapon" or inventory.value=="_wear":
         for i in range(len(tem)):
-          embed.add_field(name=info[i],value=f"{tem[i]} {gap[i] if gap[i] else empty}",inline=true[i])
+          if i==0:
+            pass
+          else:
+            embed.add_field(name=info[i],value=f"{tem[i]} {gap[i] if gap[i] else empty}",inline=true[i])
         cur.execute("SELECT level FROM user_data WHERE id = %s",(interaction.user.id))
         level = cur.fetchone()[0]
         equip = ui.Button(style=ButtonStyle.green,emoji="🛡",disabled=(False if level>=tem[3] else True),label=("착용하기" if level>=tem[3] else "레벨이 낮습니다."))
