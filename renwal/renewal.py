@@ -370,8 +370,8 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
   check =cur.fetchone()
   if not check:
     embed=discord.Embed(title="강화 에러")
-    embed.add_field(name="아이템을 착용하고 있지 않습니다.",value="\u200b")
-    await interaction.response.send_message(embed=embed)
+    embed.add_field(name="아이템을 착용하고 있지 않습니다.",value="\u200b",)
+    await interaction.response.send_message(embed=embed,ephemeral=True)
   else:
     check=list(check)
     check.pop(0)
