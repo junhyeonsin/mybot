@@ -358,11 +358,10 @@ class ItemInventory():
     return items
   def display(self,item):
     item=list(item)
-    item.pop(0)
     if self.value=="_weapon":
+      item.pop(0)
       cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1")
       wearing = cur.fetchone()
-
       gap=["" for _ in range(13)]
       if wearing:
         wearing = list(wearing)
@@ -388,6 +387,7 @@ class ItemInventory():
       item.pop()
       item.insert(6,"\u200b")
     elif self.value=="_wear": 
+      item.pop(0)
       cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1 AND part = {item[15]}")
       wearing = cur.fetchone()
       gap=["" for _ in range(15)]
