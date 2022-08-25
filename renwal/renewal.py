@@ -180,6 +180,8 @@ async def queuelist(interaction:Interaction):
 @tree.command(name="join", description="봇 초대")
 async def joinmusic(interaction:Interaction):
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
+  if interaction.user.voice.channel is None:
+    return await interaction.response.send_message("아무채널에도 들어가있지 않아요!",ephemeral=True)
   if voice_client is None and interaction.user.voice is not None:
     await interaction.user.voice.channel.connect()
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
