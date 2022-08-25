@@ -28,7 +28,6 @@ class Exp():
     while cnt<10:
       cnt+=1
       string+=str(list[0])
-    print(string)
     return string
 
 #클래스명
@@ -143,7 +142,6 @@ class Default():
             del data[j]
           else:
             j+=1
-      print(data)
       cur.executemany(f"INSERT INTO `{self.id}_etc` VALUES(%s,%s,%s,%s,%s,%s)",data)
       con.commit()
     def use():
@@ -159,7 +157,6 @@ class Default():
             del data[j]
           else:
             j+=1
-      print(data)
       cur.executemany(f"INSERT INTO `{self.id}_use` VALUES(%s,%s,%s,%s,%s,%s)",data)
       con.commit()
     use()
@@ -346,7 +343,6 @@ class Dungeon():
       #weapon=(0,1,1)
     #if item[2]==None:
       #item=(0,0,0)
-    print(item,weapon,stat)
     mp=item[2]+weapon[2]+stat[3]
     hp=Hp(int(stat[1])*5+50,item[1],0)
     damage=Damage(stat[0],item[0]+weapon[0],weapon[1],30)
