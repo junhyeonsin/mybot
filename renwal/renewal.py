@@ -681,10 +681,10 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     async def equip_callback(interaction:discord.Interaction):
       if inventory.value=="_weapon":
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid={select.values[0]}) as init)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid:={select.values[0]}) as init)")
       elif inventory.value=="_wear":  
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1 AND part = {item[int(select.values[0])][15]}")
-        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid={select.values[0]}) as init)")
+        cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE (SELECT @rowid:=@rowid+1 as rowid FROM `{interaction.user.id}{inventory.value}`, (SELECT @rowid:={select.values[0]}) as init)")
       con.commit()
       embed.set_footer(text="성공적으로 아이템을 착용했습니다.")
       view=ui.View()
