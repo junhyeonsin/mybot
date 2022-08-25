@@ -190,7 +190,7 @@ async def joinmusic(interaction:Interaction):
     return await interaction.response.send_message(f"{interaction.user.voice.channel.name}채널 참가함!",ephemeral=True)
 
 @tree.command(name="play", description="노래 시작")
-async def playmusic(interaction:Interaction,url_title:str):
+async def playmusic(interaction:Interaction,url_title:str,loop:bool=False):
   await interaction.response.send_message("노래를 찾고있어요!!")
   if interaction.user.voice is None:
     await interaction.edit_original_response(content="아무 채널에도 들어가있지 않아요.")
@@ -199,7 +199,7 @@ async def playmusic(interaction:Interaction,url_title:str):
     if voice_client == None:
       await interaction.user.voice.channel.connect()
       voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    player = await YTDLSource.from_url(url_title, loop=None)
+    player = await YTDLSource.from_url(url_title, loop=False)
     queue.append(player)
     if not voice_client.is_playing():
       voice_client.play(player,after=lambda e: nextsong(interaction))
