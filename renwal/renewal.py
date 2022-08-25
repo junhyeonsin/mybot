@@ -199,7 +199,7 @@ async def playmusic(interaction:Interaction,url_title:str,loop:bool=False):
     if voice_client == None:
       await interaction.user.voice.channel.connect()
       voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    player = await YTDLSource.from_url(url_title, loop=False)
+    player = await YTDLSource.from_url(url_title, loop=loop)
     queue.append(player)
     if not voice_client.is_playing():
       voice_client.play(player,after=lambda e: nextsong(interaction))
