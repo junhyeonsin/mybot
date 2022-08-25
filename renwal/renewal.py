@@ -393,7 +393,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
     gold= cur.fetchone()[0]
     if check[2]=="F": 
       return await interaction.response.send_message("강화가 불가능한 아이템입니다.",ephemeral=True)
-    rein = Reinforce(gold,amount,check[1],check[2])
+    rein = Reinforce(gold,amount,check[2],check[3])
     a,b=rein.display()
     if not a or not b:
       await interaction.response.send_message("강화가 불가능한 아이템입니다.",ephemeral=True)
