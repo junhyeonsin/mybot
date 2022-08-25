@@ -169,8 +169,8 @@ class Default():
     li=['_use','_etc','_cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}{i}`(item_code INTEGER PRIMARY KEY, item_name TEXT, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(item_code INTEGER AUTO_INCREMENT PRIMARY KEY, item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER, url TEXT )")
+    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_code INTEGER AUTO_INCREMENT PRIMARY KEY ,item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
     cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",("초보자의검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None))
