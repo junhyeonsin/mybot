@@ -273,7 +273,7 @@ class Reward():
       stat.append(0)
       stat.append(info[16])   
       stat.append(info[18])
-      cur.execute(f"INSERT INTO `{self.id}_wear` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
+      cur.execute(f"INSERT INTO `{self.id}_wear` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(None,stat))  
       con.commit()
       return info[0]
     return None
@@ -301,7 +301,7 @@ class Reward():
         stat.append(None)
       stat.append(0)
       stat.append(info[16])
-      cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
+      cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(None,stat))  
       con.commit()
       return info[0]
     return None
