@@ -28,6 +28,7 @@ class Exp():
     while cnt<10:
       cnt+=1
       string+=str(list[0])
+    print(string)
     return string
 
 #클래스명
@@ -42,7 +43,7 @@ class Reinforce():
   def __init__(self,gold,item,number,rank):
     self.gold=int(gold)
     self.item=item
-    self.number=int(number)
+    self.number=number
     self.rank=rank
   def require(self):
     cur.execute(f"SELECT * FROM rein_money WHERE `rank` = %s",(self.rank))
