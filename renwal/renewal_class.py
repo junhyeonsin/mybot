@@ -40,9 +40,9 @@ class Class():
     
 class Reinforce():
   def __init__(self,gold,item,number,rank):
-    self.gold=gold
+    self.gold=int(gold)
     self.item=item
-    self.number=number
+    self.number=int(number)
     self.rank=rank
   def require(self):
     cur.execute(f"SELECT * FROM rein_money WHERE `rank` = %s",(self.rank))
