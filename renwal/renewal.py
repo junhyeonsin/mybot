@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from msilib.schema import TextStyle
 from discord.ext import tasks
 import enum
 import youtube_dl
@@ -222,8 +223,19 @@ async def shfflemusic(interaction:Interaction):
   await asyncio.sleep(7)
   await interaction.delete_original_response()
 @tree.command(name="skip", description="노래 스킵")
-async def skipmusic(interaction:Interaction,갯수:int=1):
+async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
   global queue
+  if 인덱스:
+    class skipModal(ui.Modal,title=f"인덱스 스킵 갯수:{갯수}"):
+      answer=ui.TextInput(label="1번~n번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.")
+      async def on_submit(self, interaction: Interaction):
+        if self.answer.value.isdigit():
+          del queue[self.answer.value-1:self.answer.value+갯수]
+          await interaction.response.send_message(f"정상적으로 {self.answer.value}번째 부터 {self.answer.value+갯수}번째 까지 제거되었습니다.")
+        else: 
+          await interaction.response.send_message("삭제할 숫자만 적어주세요.")
+        await asyncio.sleep(7)
+        await interaction.delete_original_response()
   if 갯수 > len(queue):
     갯수=len(queue)
   queue=queue[갯수-1:len(queue)]
