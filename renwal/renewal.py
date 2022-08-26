@@ -19,7 +19,6 @@ class MyClient(discord.Client):
   @tasks.loop(time=datetime.time(hour=8,minute=0,second=0,tzinfo=KST))
   async def daily_message(self):
     channel=self.get_channel(955246009427038261)
-    #await channel.send("ddd")
   async def on_ready(self):
     await self.wait_until_ready()
     await tree.sync()
@@ -31,7 +30,6 @@ class MyClient(discord.Client):
       guild=member.guild
       role=discord.utils.get(guild.roles,name="ㅇㅇㅇㅇ")
       await member.add_roles(role)
-      #await member.send(f"{member.name}님 안녕하세요! ")
     except:
       pass
   async def bt(self,items):
@@ -89,9 +87,6 @@ intents= discord.Intents.all()
 client = MyClient(intents=intents)
 tree = app_commands.CommandTree(client)
 
-
-
-GUILD_ID=955246008923742209
 youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
     'format': 'bestaudio/best',
