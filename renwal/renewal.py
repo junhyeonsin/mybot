@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-from msilib.schema import TextStyle
 from discord.ext import tasks
 import enum
 import youtube_dl
