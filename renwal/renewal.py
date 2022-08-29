@@ -135,8 +135,8 @@ def nextsong(interaction:Interaction):
   if not len(queue[interaction.guild.id])==0:
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
     voice_client.play(queue[interaction.guild.id][0],after=lambda e:nextsong(interaction))
-@tree.command(name="queue[interaction.guild.id]", description="노래 리스트")
-async def queueist(interaction:Interaction):
+@tree.command(name="queue", description="노래 리스트")
+async def queuelist(interaction:Interaction):
   if len(queue[interaction.guild.id])==0:
     return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
   global page
