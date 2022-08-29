@@ -126,7 +126,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 queue={}
 
-def nextsong(interaction:Interaction):
+def nextsong(interaction:Interaction,error):
+  print(error)
   guild=str(interaction.guild.id)
   print(f"end : {guild}")
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
@@ -209,9 +210,8 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
       queue[guild].insert(1,player)
     else:
       queue[guild].append(player)
-    print(queue)
     if not voice_client.is_playing():
-      voice_client.play(player,after=lambda e: nextsong(interaction))
+      voice_client.play(player,after=lambda e: nextsong(interaction,e))
       await interaction.edit_original_response(content=f"{player.title} 재생중!!")
     else:
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
