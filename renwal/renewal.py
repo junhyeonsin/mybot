@@ -211,7 +211,7 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     else:
       queue[guild].append(player)
     if not voice_client.is_playing():
-      voice_client.play(player,after=lambda e: nextsong(interaction,e))
+      voice_client.play(player,after=nextsong(interaction))
       await interaction.edit_original_response(content=f"{player.title} 재생중!!")
     else:
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
