@@ -126,7 +126,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 queue={}
 
-def nextsong(interaction:Interaction,error):
+def nextsong(interaction:Interaction):
   print(error)
   guild=str(interaction.guild.id)
   print(f"end : {guild}")
