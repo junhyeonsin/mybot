@@ -126,7 +126,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 queue={}
 
-def nextsong(interaction:Interaction):
+def nextsong(interaction:Interaction,error):
+  print(error)
   guild=str(interaction.guild.id)
   print(f"end : {guild}")
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
@@ -136,7 +137,7 @@ def nextsong(interaction:Interaction):
     voice_client.stop()
   if not len(queue[guild])==0:
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    voice_client.play(queue[guild][0],after=lambda e:nextsong(interaction))
+    voice_client.play(queue[guild][0],after=lambda e:nextsong(interaction,e))
 @tree.command(name="queue", description="노래 리스트")
 async def queuelist(interaction:Interaction):
   guild=str(interaction.guild.id)
@@ -210,7 +211,7 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     else:
       queue[guild].append(player)
     if not voice_client.is_playing():
-      voice_client.play(player,after=None)
+      voice_client.play(player,after=lambda e: nextsong(interaction,e))
       await interaction.edit_original_response(content=f"{player.title} 재생중!!")
     else:
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
@@ -245,6 +246,7 @@ async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
           await interaction.response.send_message("삭제할 숫자만 적어주세요.")
         await asyncio.sleep(7)
         await interaction.delete_original_response()
+    await interaction.response.send_modal(skipModal())
   if 갯수 > len(queue[guild]):
     갯수=len(queue[guild])
   queue[guild]=queue[guild][갯수-1:len(queue[guild])]
