@@ -194,7 +194,7 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
   guild=str(interaction.guild.id)
   try:
     queue[guild]
-  except TypeError:
+  except KeyError:
     queue[guild]=[]
   if interaction.user.voice is None:
     await interaction.edit_original_response(content="아무 채널에도 들어가있지 않아요.")
