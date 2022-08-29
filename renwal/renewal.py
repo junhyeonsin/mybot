@@ -128,6 +128,7 @@ queue={}
 
 def nextsong(interaction:Interaction):
   guild=str(interaction.guild.id)
+  print(f"end : {guild}")
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   if len(queue[guild])>0:
     queue[guild].pop(0)
