@@ -192,7 +192,9 @@ async def joinmusic(interaction:Interaction):
 async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=False):
   await interaction.response.send_message("노래를 찾고있어요!!")
   guild=str(interaction.guild.id)
-  if queue[guild] is None:
+  try:
+    queue[guild]
+  except TypeError:
     queue[guild]=[]
   if interaction.user.voice is None:
     await interaction.edit_original_response(content="아무 채널에도 들어가있지 않아요.")
