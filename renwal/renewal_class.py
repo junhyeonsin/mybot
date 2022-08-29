@@ -28,7 +28,6 @@ class Exp():
     while cnt<10:
       cnt+=1
       string+=str(list[0])
-    print(string)
     return string
 
 #클래스명
