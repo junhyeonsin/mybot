@@ -124,34 +124,34 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data=data['entries'][0]
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-queue=[]
+queue={}
 
 def nextsong(interaction:Interaction):
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-  if len(queue)>0:
-    queue.pop(0)
+  if len(queue[interaction.guild.id])>0:
+    queue[interaction.guild.id].pop(0)
   if not voice_client is None:
     voice_client.stop()
-  if not len(queue)==0:
+  if not len(queue[interaction.guild.id])==0:
     voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    voice_client.play(queue[0],after=lambda e:nextsong(interaction))
-@tree.command(name="queue", description="노래 리스트")
-async def queuelist(interaction:Interaction):
-  if len(queue)==0:
+    voice_client.play(queue[interaction.guild.id][0],after=lambda e:nextsong(interaction))
+@tree.command(name="queue[interaction.guild.id]", description="노래 리스트")
+async def queueist(interaction:Interaction):
+  if len(queue[interaction.guild.id])==0:
     return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
   global page
   page=1
   def em():
     embed= discord.Embed(title="노래 리스트")
     for i in range((page-1)*10,page*10):
-      if len(queue)>i:
-        embed.add_field(name=f"{i+1}. {queue[i].title}",value="\u200b",inline=False)
+      if len(queue[interaction.guild.id])>i:
+        embed.add_field(name=f"{i+1}. {queue[interaction.guild.id][i].title}",value="\u200b",inline=False)
     embed.set_footer(text=f"Page : {page}")
     return embed
   def vi():
     view= ui.View()
     undo = ui.Button(style=ButtonStyle.green,label="이전으로",disabled=(True if page==1 else False))
-    next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue) <= page*10 else False))
+    next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue[interaction.guild.id]) <= page*10 else False))
     refresh= ui.Button(style=ButtonStyle.red,label="새로고침")
     view.add_item(undo)
     view.add_item(next)
@@ -189,6 +189,8 @@ async def joinmusic(interaction:Interaction):
 @tree.command(name="play", description="노래 시작")
 async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=False):
   await interaction.response.send_message("노래를 찾고있어요!!")
+  if queue[interaction.guild.id] is None:
+    queue[interaction.guild.id]=[]
   if interaction.user.voice is None:
     await interaction.edit_original_response(content="아무 채널에도 들어가있지 않아요.")
   else:
@@ -197,10 +199,10 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
       await interaction.user.voice.channel.connect()
       voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
     player = await YTDLSource.from_url(url_title, loop=None)
-    if 먼저틀기 and len(queue)>1:
-      queue.insert(1,player)
+    if 먼저틀기 and len(queue[interaction.guild.id])>1:
+      queue[interaction.guild.id].insert(1,player)
     else:
-      queue.append(player)
+      queue[interaction.guild.id].append(player)
     if not voice_client.is_playing():
       voice_client.play(player,after=lambda e: nextsong(interaction))
       await interaction.edit_original_response(content=f"{player.title} 재생중!!")
@@ -211,13 +213,13 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
 @tree.command(name="shuffle", description="노래 셔플")
 async def shfflemusic(interaction:Interaction):
   global queue
-  first=queue[0]
-  random.shuffle(queue)
-  for i in range(len(queue)):
-    if queue[i]==first:
-      del queue[i]
+  first=queue[interaction.guild.id][0]
+  random.shuffle(queue[interaction.guild.id])
+  for i in range(len(queue[interaction.guild.id])):
+    if queue[interaction.guild.id][i]==first:
+      del queue[interaction.guild.id][i]
       break
-  queue.insert(0,first)
+  queue[interaction.guild.id].insert(0,first)
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
   await interaction.delete_original_response()
@@ -229,15 +231,15 @@ async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
       answer=ui.TextInput(label="1번~n번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.")
       async def on_submit(self, interaction: Interaction):
         if self.answer.value.isdigit():
-          del queue[self.answer.value-1:self.answer.value+갯수]
+          del queue[interaction.guild.id][self.answer.value-1:self.answer.value+갯수]
           await interaction.response.send_message(f"정상적으로 {self.answer.value}번째 부터 {self.answer.value+갯수}번째 까지 제거되었습니다.")
         else: 
           await interaction.response.send_message("삭제할 숫자만 적어주세요.")
         await asyncio.sleep(7)
         await interaction.delete_original_response()
-  if 갯수 > len(queue):
-    갯수=len(queue)
-  queue=queue[갯수-1:len(queue)]
+  if 갯수 > len(queue[interaction.guild.id]):
+    갯수=len(queue[interaction.guild.id])
+  queue[interaction.guild.id]=queue[interaction.guild.id][갯수-1:len(queue[interaction.guild.id])]
   await interaction.response.send_message(f"{갯수}개의 음악이 삭제되었습니다.")
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   voice_client.stop()
