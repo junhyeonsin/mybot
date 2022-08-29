@@ -245,7 +245,6 @@ async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
           await interaction.response.send_message("삭제할 숫자만 적어주세요.")
         await asyncio.sleep(7)
         await interaction.delete_original_response()
-    await interaction.response.send_modal(skipModal())
   if 갯수 > len(queue[guild]):
     갯수=len(queue[guild])
   queue[guild]=queue[guild][갯수-1:len(queue[guild])]
