@@ -127,7 +127,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 queue={}
 
 def nextsong(interaction:Interaction):
-  print(error)
   guild=str(interaction.guild.id)
   print(f"end : {guild}")
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
