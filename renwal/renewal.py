@@ -213,7 +213,7 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     if not voice_client.is_playing():
       print(player.data['thumbnails'][4])
       embed=discord.Embed(title=player.title)
-      embed.add_field(player.data['thumbnails'][4]['url'])
+      embed.set_image(url=player.data['thumbnails'][4]['url'])
       voice_client.play(player,after=lambda e: nextsong(interaction,e))
       await interaction.edit_original_response(content=f"{player.title} 재생중!!")
     else:
