@@ -240,7 +240,7 @@ async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
   guild=str(interaction.guild.id)
   if 인덱스:
     class skipModal(ui.Modal,title=f"인덱스 스킵 갯수:{갯수}"):
-      answer=ui.TextInput(label="1번~n번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.")
+      answer=ui.TextInput(label=f"1번~{len(queue)}번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.")
       async def on_submit(self, interaction: Interaction):
         try:
           value=int(self.answer.value)
