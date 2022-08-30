@@ -361,9 +361,11 @@ async def dungeonreset(interaction:Interaction):
 async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int ):
   cur.execute("SELECT stat_point,hp FROM user_stat WHERE id = %s",(interaction.user.id))
   check=cur.fetchone()
-  if 포인트 > check[0]:
-    title="스테이터스 에러"
-    name="스테이터스 포인트가 모자랍니다."
+  if 포인트 > check[0] and 스텟.name!="체력":
+    title="스테이터스"
+    name="**{스텟.name}**을 **+{check[0]}** 만큼 올렸습니다."
+    cur.execute(f"UPDATE user_stat SET {스텟.value}={스텟.value}+{check[0]},stat_point=stat_point-{check[0]} WHERE id = %s",(interaction.user.id))
+    con.commit()
   elif 포인트 < 0:
     title="스테이터스 에러"
     name="스테이터스가 0보다 작을수는 없습니다."
