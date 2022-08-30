@@ -192,7 +192,7 @@ async def joinmusic(interaction:Interaction):
 
 @tree.command(name="play", description="노래 시작")
 async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=False):
-  await interaction.response.send_message("노래를 찾고있어요!!")
+  #await interaction.response.send_message("노래를 찾고있어요!!")
   guild=str(interaction.guild.id)
   try:
     queue[guild]
