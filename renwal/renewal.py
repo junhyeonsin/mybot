@@ -234,25 +234,18 @@ async def shfflemusic(interaction:Interaction):
   await interaction.response.send_message("음악이 셔플되었습니다.")
   await asyncio.sleep(7)
   await interaction.delete_original_response()
-@tree.command(name="skip", description="노래 스킵")
-async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
+@tree.command(name="indexskip", description="순서 삭제")
+async def indexskipmusic(interaction:Interaction,시작:int,끝:int):
   global queue
   guild=str(interaction.guild.id)
-  if 인덱스:
-    class skipModal(ui.Modal,title=f"인덱스 스킵 갯수:{갯수}"):
-      answer=ui.TextInput(label=f"1번~{len(queue[guild])}번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.",max_length=len(queue[guild])//10+1)
-      async def on_submit(self, interaction: Interaction):
-        try:
-          value=int(self.answer.value)
-        except ValueError:
-          await interaction.response.send_message("삭제할 숫자만 적어주세요.",ephemeral=True)
-        else:
-          if value<=len(queue[guild]):
-            del queue[guild][value-1:value+갯수]
-            await interaction.response.send_message(f"정상적으로 {value}번째 부터 {value+갯수-1}번째 까지 제거되었습니다.")
-            await asyncio.sleep(7)
-            await interaction.delete_original_response()
-    await interaction.response.send_modal(skipModal())
+  del queue[guild][시작-1:끝]
+  await interaction.response.send_message(f"{시작}번째부터 {끝}번째 노래가 삭제되었습니다.")
+  await asyncio.sleep(7)
+  await interaction.delete_original_response()
+@tree.command(name="skip", description="노래 스킵")
+async def skipmusic(interaction:Interaction,갯수:int=1):
+  global queue
+  guild=str(interaction.guild.id)
   if 갯수 > len(queue[guild]):
     갯수=len(queue[guild])
   queue[guild]=queue[guild][갯수-1:len(queue[guild])]
