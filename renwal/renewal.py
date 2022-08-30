@@ -211,13 +211,13 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     else:
       queue[guild].append(player)
     if not voice_client.is_playing():
-      print(player.data['thumbnails'][4])
-      embed=discord.Embed(title=player.title)
-      embed.set_image(url=player.data['thumbnails'][4]['url'])
-      voice_client.play(player,after=lambda e: nextsong(interaction,e))
-      await interaction.edit_original_response(embed=embed)
+      value="재생중!!"      
+      voice_client.play(player,after=lambda e: nextsong(interaction,e))    
     else:
-      await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
+      value="재생목록 추가됨!!"
+    embed=discord.Embed(title=f"{player.title} {value}")
+    embed.set_image(url=player.data['thumbnails'][4]['url'])
+    await interaction.edit_original_response(content="",embed=embed)
     await asyncio.sleep(7)
     await interaction.delete_original_response()
 @tree.command(name="shuffle", description="노래 셔플")
