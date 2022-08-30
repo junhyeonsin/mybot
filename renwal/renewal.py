@@ -242,13 +242,16 @@ async def skipmusic(interaction:Interaction,갯수:int=1,인덱스:bool=False):
     class skipModal(ui.Modal,title=f"인덱스 스킵 갯수:{갯수}"):
       answer=ui.TextInput(label="1번~n번까지 숫자를 적어주세요.",placeholder="숫자를 적어주세요.")
       async def on_submit(self, interaction: Interaction):
-        if self.answer.value.isdigit() and int(self.answer.value)<=len(queue[guild]):
-          del queue[guild][int(self.answer.value)-1:int(self.answer.value)+갯수]
-          await interaction.response.send_message(f"정상적으로 {self.answer.value}번째 부터 {self.answer.value+갯수}번째 까지 제거되었습니다.")
-        else: 
-          await interaction.response.send_message("삭제할 숫자만 적어주세요.")
-        await asyncio.sleep(7)
-        await interaction.delete_original_response()
+        try:
+          value=int(self.answer.value)
+        except TypeError:
+          await interaction.response.send_message("삭제할 숫자만 적어주세요.",ephemeral=True)
+        else:
+          if value<=len(queue[guild]):
+            del queue[guild][value-1:value+갯수]
+            await interaction.response.send_message(f"정상적으로 {value}번째 부터 {value+갯수}번째 까지 제거되었습니다.")
+            await asyncio.sleep(7)
+            await interaction.delete_original_response()
     await interaction.response.send_modal(skipModal())
   if 갯수 > len(queue[guild]):
     갯수=len(queue[guild])
