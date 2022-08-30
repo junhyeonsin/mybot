@@ -216,7 +216,8 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     else:
       value="재생목록 추가됨!!"
     embed=discord.Embed(title=f"{player.title} {value}")
-    embed.set_image(url=player.data['thumbnails'][4]['url'])
+    print(player.data['thumbnails'])
+    embed.set_image(url=player.data['thumbnails'][-1]['url'])
     await interaction.edit_original_response(content="",embed=embed)
     await asyncio.sleep(7)
     await interaction.delete_original_response()
