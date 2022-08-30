@@ -215,7 +215,7 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
       embed=discord.Embed(title=player.title)
       embed.set_image(url=player.data['thumbnails'][4]['url'])
       voice_client.play(player,after=lambda e: nextsong(interaction,e))
-      await interaction.edit_original_response(content=f"{player.title} 재생중!!",embed=embed)
+      await interaction.edit_original_response(embed=embed)
     else:
       await interaction.edit_original_response(content=f"{player.title} 재생목록 추가됨!")
     await asyncio.sleep(7)
