@@ -856,7 +856,6 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view.add_item(select)
   async def select_callback(interaction:Interaction):
     item=select.values[0]
-    print(f"item:{item}")
     global am
     am=1
     await interaction.response.edit_message(embed=em(item,am),view=vi(item))
