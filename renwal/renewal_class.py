@@ -195,15 +195,15 @@ class MakeItem():
       need_etc_amount=""
       etc_amount=""
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
-  def disable(self,name,id,data):
+  def disable(self,name,id,data,am):
     ne,nea,ea,nu,nua,ua=self.callamount(name,id,data)
     if ne:
       for i in range(len(nea)):
-        if int(nea[i])>int(ea[i]):
+        if int(nea[i])*am>int(ea[i]):
           return True
     if nu:
       for i in range(len(nua)):
-        if int(nua[i])>int(ua[i]):
+        if int(nua[i])*am>int(ua[i]):
           return True
     return False
   def etc(self,id,name):
