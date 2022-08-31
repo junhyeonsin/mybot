@@ -841,14 +841,14 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   item=make.itemlist(종류.name)
   for i in item:
     if 종류.name=="무기" or 종류.name=="방어구":
-      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=str(i))
+      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=i[0])
     else:
       val=["거래가능","거래불가"]
-      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})",value=str(i))
+      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})",value=i[1])
   view=ui.View()
   view.add_item(select)
   async def select_callback(interaction:Interaction):
-    item=select.values[0].strip('][').split(", ")
+    item=select.values[0]
     embed=discord.Embed(title=f"{item[1]} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
     a= 1 if 종류.name=="무기" or 종류.name=="방어구" else 0
