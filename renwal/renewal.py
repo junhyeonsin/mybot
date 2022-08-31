@@ -854,10 +854,10 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     embed.add_field(name="재료",value="\u200b",inline=False)
     a= 1 if 종류.name=="무기" or 종류.name=="방어구" else 0
     need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
-    for i in len(need_etc):
+    for i in range(len(need_etc)):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
       embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount}개 보유중 : ({etc_amount})",value="\u200b")
-    for i in len(need_use):
+    for i in range(len(need_use)):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
       embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount}개 보유중 : ({use_amount})",value="\u200b")
     button=ui.Button(style=ButtonStyle.green,label="제작하기")
