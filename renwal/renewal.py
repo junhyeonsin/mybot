@@ -857,7 +857,8 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view.add_item(select)
   async def select_callback(interaction:Interaction):
     item=select.values[0]
-    global am
+    global am,item_global
+    item_global=item
     am=1
     await interaction.response.edit_message(embed=em(item,am),view=vi(item))
   async def button_callback(interaction:Interaction):
@@ -873,7 +874,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
           else:
             global am
             am=int(self.answer.value)
-            await interaction.response.edit_message(embed=em(item,am),view=vi(item))
+            await interaction.response.edit_message(embed=em(item,am),view=vi(item_global))
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
     embed=discord.Embed(title=f"{item} 제작")
