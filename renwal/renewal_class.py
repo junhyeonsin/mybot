@@ -104,7 +104,7 @@ class MakeItem():
       cur.execute("SELECT * FROM make_etc")
     return cur.fetchall() 
   def weapon(self,id,name):
-    cur.execute(f"SELECT * FROM make_weapon WHERE item_name = {name} ")
+    cur.execute(f"SELECT * FROM make_weapon WHERE item_name = %s",name)
     make_item=cur.fetchone()
     if make_item[1]:
       need_etc=make_item[1].split(" ")
@@ -123,7 +123,7 @@ class MakeItem():
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def wear(self,id,name):
-    cur.execute(f"SELECT * FROM make_wear WHERE item_name = {name} ")
+    cur.execute(f"SELECT * FROM make_wear WHERE item_name = %s ",name)
     make_item=cur.fetchone()
     if make_item[1]:
       need_etc=make_item[1].split(" ")
@@ -142,7 +142,7 @@ class MakeItem():
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def use(self,id,name):
-    cur.execute(f"SELECT * FROM make_use WHERE item_name = {name} ")
+    cur.execute(f"SELECT * FROM make_use WHERE item_name = %s ",name)
     make_item=cur.fetchone()
     if make_item[4]:
       need_etc=make_item[4].split(" ")
@@ -163,7 +163,7 @@ class MakeItem():
     self.callamount(name,id,data)
 
   def etc(self,id,name):
-    cur.execute(f"SELECT * FROM make_etc WHERE item_name = `{name}` ")
+    cur.execute(f"SELECT * FROM make_etc WHERE item_name = %s ",name)
     make_item=cur.fetchone()
     if make_item[4]:
       need_etc=make_item[4].split(" ")
