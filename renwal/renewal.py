@@ -477,7 +477,7 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
 dungeon_dic={}
 @tree.command(name="던전", description="던전입니다.")
 async def dungeon(interaction:discord.Interaction,층:int):
-  async def callback(interaction:Interaction):
+  async def callback(interaction:Interaction,t:bool):
     skill=Skill(interaction.user.id)
     default = Default(interaction.user.id)
     global dungeon_dic
@@ -647,7 +647,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
       if enemy[1]<=0:
         embed=discord.Embed(title="전투 보상")
         button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
-        button.callback=callback
+        button.callback=callback(interaction,False)
         view=ui.View()
         view.add_item(button)
         reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
@@ -674,8 +674,11 @@ async def dungeon(interaction:discord.Interaction,층:int):
           embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
         dungeon_dic[interaction.user.id]=False
         await interaction.response.edit_message(embed=embed,view=view)
-    await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
-  await callback(interaction)
+    if t:
+      await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
+    else:
+      await interaction.response.edit_message(embed=em(),view=vi(),ephemeral=True)
+  await callback(interaction,True)
 @tree.command(name="가이드", description="ㅇㅇ")
 async def Guide(interaction:discord.Interaction):
   embed=discord.Embed(title="MOTD")
