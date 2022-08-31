@@ -840,7 +840,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   make=MakeItem()
   item=make.itemlist(종류.name)
   for i in item:
-    print(i)
+    print(i[0])
     if 종류.name=="무기" or 종류.name=="방어구":
       select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=i[0])
     else:
@@ -850,10 +850,10 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view.add_item(select)
   async def select_callback(interaction:Interaction):
     item=select.values[0]
-    embed=discord.Embed(title=f"{item[1]} 제작")
+    embed=discord.Embed(title=f"{item} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
     a= 1 if 종류.name=="무기" or 종류.name=="방어구" else 0
-    need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item[a])
+    need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
     for i in len(need_etc):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
       embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount}개 보유중 : ({etc_amount})",value="\u200b")
