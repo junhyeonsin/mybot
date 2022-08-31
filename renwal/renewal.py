@@ -867,7 +867,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     
       async def on_submit(self, interaction: Interaction):
         if self.answer.value.isdigit():
-          if self.answer.value<=0:
+          if int(self.answer.value)<=0:
             await interaction.response.edit_message(content="숫자는 1보다 작을 수는 없습니다.")   
           else:
             global am
