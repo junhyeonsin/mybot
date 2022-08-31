@@ -874,6 +874,11 @@ async def makeitem(interaction:Interaction,종류:mkItem):
             await interaction.response.edit_message(embed=em(item,am),view=vi())
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
+    if type(item)==tuple:
+      if 종류.name=="무기" or 종류.name=="방어구":
+        item=item[0]
+      else:
+        item=item[1]
     embed=discord.Embed(title=f"{item} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
     cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item)
