@@ -646,7 +646,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
         await interaction.response.edit_message(embed=embed,view=None)
       if enemy[1]<=0:
         embed=discord.Embed(title="전투 보상")
-        button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=True)
+        button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
         button.callback=callback
         view=ui.View()
         view.add_item(button)
