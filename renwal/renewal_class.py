@@ -85,6 +85,16 @@ class MakeItem():
     checking.isInventory()
     checking.isItem()
 
+  def itemlist(self,name):
+    if name=="무기":
+      cur.execute("SELECT * FROM make_weapon")
+    if name=="방어구":
+      cur.execute("SELECT * FROM make_wear")
+    if name=="소비":
+      cur.execute("SELECT * FROM make_use")
+    if name=="기타":
+      cur.execute("SELECT * FROM make_etc")
+    return cur.fetchall() 
   def weapon(self,id,name):
     cur.execute(f"SELECT * FROM make_weapon WHERE item_name = {name} ")
     make_item=cur.fetchone()

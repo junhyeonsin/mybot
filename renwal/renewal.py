@@ -838,15 +838,15 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   select=ui.Select(placeholder="아이템제작")
   make=MakeItem()
   item=make.itemlist(종류.name)
-  for i in item:
+  for j,i in enumerate(item):
     if 종류.name=="무기" or 종류.name=="방어구":
-      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}")
+      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=j+1)
     else:
       val=["거래가능","거래불가"]
-      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})")
+      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})",value=j+1)
   view=ui.View()
   view.add_item(select)
-  await interaction.response.send_message(embed=embed,view=view)
+  await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
   if code=="아잉아잉0325":
