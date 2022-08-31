@@ -886,6 +886,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
       embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount[i]*am}개\n보유중 : ({use_amount[i]*am})",value="\u200b")
     embed.set_thumbnail(url=url)
+    return embed
   def vi(item):
     button=ui.Button(style=ButtonStyle.green,label="제작하기",disabled=make.disable(종류.name,interaction.user.id,item,am))
     amount_button=ui.Button(style=ButtonStyle.red,label="갯수 변경")
@@ -893,6 +894,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     view=ui.View()
     view.add_item(button)
     view.add_item(amount_button)
+    return vi
   select.callback=select_callback
   await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
