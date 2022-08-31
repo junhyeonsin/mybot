@@ -84,6 +84,12 @@ class Inventory(enum.Enum):
   기타 = "_etc"
   캐시 = "_cash"
 
+class mkItem(enum.Enum):
+  무기="_weapon"
+  방어구="_wear"
+  소비="_use"
+  기타="_etc"
+
 intents= discord.Intents.all()
 client = MyClient(intents=intents)
 tree = app_commands.CommandTree(client)
@@ -696,7 +702,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       a=["_weapon","_wear"]
       var="(착용중)"
       empty=""
-      options=[SelectOption(label=(f"[{item[i][0]}] +{item[i][2]} {item[i][1]} {var if item[i][14+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
+      options=[SelectOption(label=(f"[{item[i][0]}] Lv.{item[i][3]} +{item[i][2]} {item[i][1]} {var if item[i][14+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
     else:
       var="거래가능"
       val="거래불가"
@@ -825,6 +831,22 @@ async def Cut(interaction:discord.Interaction,sure:bool):
 @tree.command(name="건의하기", description="건의를 할수있습니다.")
 async def modal(interaction:discord.Interaction):
   await interaction.response.send_modal(reportModal())
+
+@tree.command(name="제작",description="아이템제작")
+async def makeitem(interaction:Interaction,종류:mkItem):
+  embed=discord.Embed(title="아이템 제작소")
+  select=ui.Select(placeholder="아이템제작")
+  make=MakeItem()
+  item=make.itemlist(종류.name)
+  for i in item:
+    if 종류.name=="무기" or 종류.name=="방어구":
+      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}")
+    else:
+      val=["거래가능","거래불가"]
+      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})")
+  view=ui.View()
+  view.add_item(select)
+  await interaction.response.send_message(embed=embed,view=view)
 @tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
   if code=="아잉아잉0325":

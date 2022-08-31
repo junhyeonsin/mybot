@@ -79,6 +79,88 @@ class Modify():
     stat_colum=['str','dex','int','luck','hp','mp']
     return stat[stat_colum.index(self.arg)]
 
+class MakeItem():
+  def __init__(self):
+    checking=Default(id)
+    checking.isInventory()
+    checking.isItem()
+
+  def weapon(self,id,name):
+    cur.execute(f"SELECT * FROM make_weapon WHERE item_name = {name} ")
+    make_item=cur.fetchone()
+    if make_item[1]:
+      need_etc=make_item[1].split(" ")
+      need_etc_amount=make_item[2].split(" ")
+      for i in need_etc:
+        cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
+        if need_etc_amount>cur.fetchone()[0]:
+          return True
+    if make_item[3]:
+      need_use=make_item[3].split(" ")
+      need_use_amount=make_item[4].split(" ")
+      for i in need_use:
+        cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
+        if need_use_amount>cur.fetchone()[0]:
+          return True
+    return False
+
+  def wear(self,id,name):
+    cur.execute(f"SELECT * FROM make_wear WHERE item_name = {name} ")
+    make_item=cur.fetchone()
+    if make_item[1]:
+      need_etc=make_item[1].split(" ")
+      need_etc_amount=make_item[2].split(" ")
+      for i in need_etc:
+        cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
+        if need_etc_amount>cur.fetchone()[0]:
+          return True
+    if make_item[3]:
+      need_use=make_item[3].split(" ")
+      need_use_amount=make_item[4].split(" ")
+      for i in need_use:
+        cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
+        if need_use_amount>cur.fetchone()[0]:
+          return True
+    return False
+
+  def use(self,id,code):
+    cur.execute(f"SELECT * FROM make_use WHERE item_code = {code} ")
+    make_item=cur.fetchone()
+    if make_item[4]:
+      need_etc=make_item[4].split(" ")
+      need_etc_amount=make_item[5].split(" ")
+      for i in need_etc:
+        cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
+        if need_etc_amount>cur.fetchone()[0]:
+          return True
+    if make_item[6]:
+      need_use=make_item[6].split(" ")
+      need_use_amount=make_item[7].split(" ")
+      for i in need_use:
+        cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
+        if need_use_amount>cur.fetchone()[0]:
+          return True
+    return False
+
+  def etc(self,id,code):
+    cur.execute(f"SELECT * FROM make_etc WHERE item_code = {code} ")
+    make_item=cur.fetchone()
+    if make_item[4]:
+      need_etc=make_item[4].split(" ")
+      need_etc_amount=make_item[5].split(" ")
+      for i in need_etc:
+        cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
+        if need_etc_amount>cur.fetchone()[0]:
+          return True
+    if make_item[6]:
+      need_use=make_item[6].split(" ")
+      need_use_amount=make_item[7].split(" ")
+      for i in need_use:
+        cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
+        if need_use_amount>cur.fetchone()[0]:
+          return True
+    return False
+    
 #데미지 계산
 class Damage():
   def __init__(self,stat, item, times, crit):
