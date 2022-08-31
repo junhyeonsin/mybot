@@ -159,9 +159,11 @@ class MakeItem():
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
         use_amount.append(cur.fetchone()[0])
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
+  def disable(self,name,id,data):
+    self.callamount(name,id,data)
 
   def etc(self,id,name):
-    cur.execute(f"SELECT * FROM make_etc WHERE item_name = {name} ")
+    cur.execute(f"SELECT * FROM make_etc WHERE item_name = `{name}` ")
     make_item=cur.fetchone()
     if make_item[4]:
       need_etc=make_item[4].split(" ")
