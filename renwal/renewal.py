@@ -19,6 +19,7 @@ class MyClient(discord.Client):
   @tasks.loop(time=datetime.time(hour=8,minute=0,second=0,tzinfo=KST))
   async def daily_message(self):
     channel=self.get_channel(955246009427038261)
+    await channel.send("9시")
   async def on_ready(self):
     await self.wait_until_ready()
     await tree.sync()
