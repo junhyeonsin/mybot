@@ -856,6 +856,22 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view.add_item(select)
   async def select_callback(interaction:Interaction):
     item=select.values[0]
+    global am
+    am=1
+    await interaction.response.edit_message(embed=em(item,am),view=vi())
+  async def amount_button_callback(interaction:Interaction):
+    class amount_button_modal(ui.Modal, title="갯수 변경"):
+      answer = ui.TextInput(label="숫자를 적어주세요.",max_length=4)
+    
+      async def on_submit(self, interaction: Interaction):
+        if self.answer.value.isdigit():
+          if self.answer.value<=0:
+            await interaction.response.edit_message(content="숫자는 1보다 작을 수는 없습니다.")   
+          else:
+            global am
+            am=int(self.answer.value)
+    await interaction.response.send_modal(amount_button_modal())
+  def em(item,am):
     embed=discord.Embed(title=f"{item} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
     cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item)
@@ -863,17 +879,20 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
     for i in range(len(need_etc)):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount[i]}개\n보유중 : ({etc_amount[i]})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount[i]*am}개\n보유중 : ({etc_amount[i]*am})",value="\u200b")
     for i in range(len(need_use)):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount[i]}개\n보유중 : ({use_amount[i]})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount[i]*am}개\n보유중 : ({use_amount[i]*am})",value="\u200b")
     embed.set_thumbnail(url=url)
-    button=ui.Button(style=ButtonStyle.green,label="제작하기",disabled=make.disable(종류.name,interaction.user.id,item))
+  def vi():
+    button=ui.Button(style=ButtonStyle.green,label="제작하기",disabled=make.disable(종류.name,interaction.user.id,item,am))
+    amount_button=ui.Button(style=ButtonStyle.red,label="갯수 변경")
+    amount_button.callback=amount_button_callback
     view=ui.View()
     view.add_item(button)
-    await interaction.response.edit_message(embed=embed,view=view)
+    view.add_item(amount_button)
   select.callback=select_callback
-  await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
+  await interaction.response.send_message(embed=em(),view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
   if code=="아잉아잉0325":
