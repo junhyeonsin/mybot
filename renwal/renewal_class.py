@@ -84,7 +84,15 @@ class MakeItem():
     checking=Default(id)
     checking.isInventory()
     checking.isItem()
-
+  def callamount(self,name,id,data):
+    if name=="무기":
+      return self.weapon(id,data)
+    if name=="방어구":
+      return self.wear(id,data)
+    if name=="소비":
+      return self.use(id,data)
+    if name=="기타":
+      return self.etc(id,data)
   def itemlist(self,name):
     if name=="무기":
       cur.execute("SELECT * FROM make_weapon")
@@ -101,18 +109,18 @@ class MakeItem():
     if make_item[1]:
       need_etc=make_item[1].split(" ")
       need_etc_amount=make_item[2].split(" ")
+      etc_amount=[]
       for i in need_etc:
         cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
-        if need_etc_amount>cur.fetchone()[0]:
-          return True
+        etc_amount.append(cur.fetchone()[0])
     if make_item[3]:
       need_use=make_item[3].split(" ")
       need_use_amount=make_item[4].split(" ")
+      use_amount=[]
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
-        if need_use_amount>cur.fetchone()[0]:
-          return True
-    return False
+        use_amount.append(cur.fetchone()[0])
+    return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def wear(self,id,name):
     cur.execute(f"SELECT * FROM make_wear WHERE item_name = {name} ")
@@ -120,56 +128,56 @@ class MakeItem():
     if make_item[1]:
       need_etc=make_item[1].split(" ")
       need_etc_amount=make_item[2].split(" ")
+      etc_amount=[]
       for i in need_etc:
         cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
-        if need_etc_amount>cur.fetchone()[0]:
-          return True
+        etc_amount.append(cur.fetchone()[0])
     if make_item[3]:
       need_use=make_item[3].split(" ")
       need_use_amount=make_item[4].split(" ")
+      use_amount=[]
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
-        if need_use_amount>cur.fetchone()[0]:
-          return True
-    return False
+        use_amount.append(cur.fetchone()[0])
+    return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
-  def use(self,id,code):
-    cur.execute(f"SELECT * FROM make_use WHERE item_code = {code} ")
+  def use(self,id,name):
+    cur.execute(f"SELECT * FROM make_use WHERE item_name = {name} ")
     make_item=cur.fetchone()
     if make_item[4]:
       need_etc=make_item[4].split(" ")
       need_etc_amount=make_item[5].split(" ")
+      etc_amount=[]
       for i in need_etc:
         cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
-        if need_etc_amount>cur.fetchone()[0]:
-          return True
+        etc_amount.append(cur.fetchone()[0])
     if make_item[6]:
       need_use=make_item[6].split(" ")
       need_use_amount=make_item[7].split(" ")
+      use_amount=[]
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
-        if need_use_amount>cur.fetchone()[0]:
-          return True
-    return False
+        use_amount.append(cur.fetchone()[0])
+    return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
-  def etc(self,id,code):
-    cur.execute(f"SELECT * FROM make_etc WHERE item_code = {code} ")
+  def etc(self,id,name):
+    cur.execute(f"SELECT * FROM make_etc WHERE item_code = {name} ")
     make_item=cur.fetchone()
     if make_item[4]:
       need_etc=make_item[4].split(" ")
       need_etc_amount=make_item[5].split(" ")
+      etc_amount=[]
       for i in need_etc:
         cur.execute(f"SELECT item_amount FROM `{id}_etc` WHERE item_code={i}")
-        if need_etc_amount>cur.fetchone()[0]:
-          return True
+        etc_amount.append(cur.fetchone()[0])
     if make_item[6]:
       need_use=make_item[6].split(" ")
       need_use_amount=make_item[7].split(" ")
+      use_amount=[]
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
-        if need_use_amount>cur.fetchone()[0]:
-          return True
-    return False
+        use_amount.append(cur.fetchone()[0])
+    return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
     
 #데미지 계산
 class Damage():

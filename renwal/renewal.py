@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from dis import disco
 from discord.ext import tasks
 import enum
 import youtube_dl
@@ -160,7 +161,7 @@ async def queuelist(interaction:Interaction):
     embed.set_footer(text=f"Page : {page}")
     return embed
   def vi():
-    view= ui.View()
+    view= ui.View(9999999)
     undo = ui.Button(style=ButtonStyle.green,label="이전으로",disabled=(True if page==1 else False))
     next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue[guild]) <= page*10 else False))
     refresh= ui.Button(style=ButtonStyle.red,label="새로고침")
@@ -642,8 +643,8 @@ async def dungeon(interaction:discord.Interaction,층:int):
       await interaction.response.edit_message(embed=embed,view=None)
     if enemy[1]<=0:
       embed=discord.Embed(title="전투 보상")
-      button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=True)
-      button.callback=dungeon
+      button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
+      button.callback=dungeon(interaction,층)
       view=ui.View()
       view.add_item(button)
       reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
@@ -838,7 +839,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   select=ui.Select(placeholder="아이템제작")
   make=MakeItem()
   item=make.itemlist(종류.name)
-  for j,i in enumerate(item):
+  for i in item:
     if 종류.name=="무기" or 종류.name=="방어구":
       select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=i)
     else:
@@ -848,7 +849,20 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view.add_item(select)
   async def select_callback(interaction:Interaction):
     item=select.values[0].strip('][').split(", ")
-    print(select.values[0])
+    embed=discord.Embed(title=f"{item[1]} 제작")
+    embed.add_field(name="재료",value="\u200b",inline=False)
+    a= 1 if 종류.name=="무기" or 종류.name=="방어구" else 0
+    need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item[a])
+    for i in len(need_etc):
+      cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
+      embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount}개 보유중 : ({etc_amount})",value="\u200b")
+    for i in len(need_use):
+      cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
+      embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount}개 보유중 : ({use_amount})",value="\u200b")
+    button=ui.Button(style=ButtonStyle.green,label="제작하기")
+    view=ui.View()
+    view.add_item(button)
+    await interaction.response.edit_message(embed=embed,view=view)
   select.callback=select_callback
   await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
