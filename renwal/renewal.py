@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-from dis import disco
 from discord.ext import tasks
 import enum
 import youtube_dl
@@ -876,6 +875,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
           else:
             global am
             am=int(self.answer.value)
+            print(item_global)
             await interaction.response.edit_message(embed=em(item,am),view=vi(item_global))
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
