@@ -207,7 +207,6 @@ class MakeItem():
           return True
     return False
   def etc(self,id,name):
-    print(name)
     cur.execute("SELECT * FROM make_etc WHERE item_name = %s",(name))
     make_item=cur.fetchone()
     if make_item[4]:

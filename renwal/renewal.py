@@ -893,7 +893,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     view=ui.View()
     view.add_item(button)
     view.add_item(amount_button)
-    return vi
+    return view
   select.callback=select_callback
   await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
