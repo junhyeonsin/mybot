@@ -120,6 +120,18 @@ class MakeItem():
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
         use_amount.append(cur.fetchone()[0])
+    try:
+      need_use
+    except UnboundLocalError:
+      need_use=""
+      need_use_amount=""
+      use_amount=""
+    try:
+      need_etc
+    except UnboundLocalError:
+      need_etc=""
+      need_etc_amount=""
+      etc_amount=""    
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def wear(self,id,name):
@@ -170,6 +182,18 @@ class MakeItem():
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
         use_amount.append(cur.fetchone()[0])
+    try:
+      need_use
+    except UnboundLocalError:
+      need_use=""
+      need_use_amount=""
+      use_amount=""
+    try:
+      need_etc
+    except UnboundLocalError:
+      need_etc=""
+      need_etc_amount=""
+      etc_amount=""
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
   def disable(self,name,id,data):
     self.callamount(name,id,data)
@@ -191,6 +215,18 @@ class MakeItem():
       for i in need_use:
         cur.execute(f"SELECT item_amount FROM `{id}_use` WHERE item_code={i}")
         use_amount.append(cur.fetchone()[0])
+    try:
+      need_use
+    except UnboundLocalError:
+      need_use=""
+      need_use_amount=""
+      use_amount=""
+    try:
+      need_etc
+    except UnboundLocalError:
+      need_etc=""
+      need_etc_amount=""
+      etc_amount=""
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
     
 #데미지 계산
