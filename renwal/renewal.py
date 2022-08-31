@@ -859,7 +859,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     print(f"item:{item}")
     global am
     am=1
-    await interaction.response.edit_message(embed=em(item,am),view=vi())
+    await interaction.response.edit_message(embed=em(item,am),view=vi(item))
   async def amount_button_callback(interaction:Interaction):
     class amount_button_modal(ui.Modal, title="갯수 변경"):
       answer = ui.TextInput(label="숫자를 적어주세요.",max_length=4)
@@ -871,14 +871,9 @@ async def makeitem(interaction:Interaction,종류:mkItem):
           else:
             global am
             am=int(self.answer.value)
-            await interaction.response.edit_message(embed=em(item,am),view=vi())
+            await interaction.response.edit_message(embed=em(item,am),view=vi(item))
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
-    if type(item)==tuple:
-      if 종류.name=="무기" or 종류.name=="방어구":
-        item=item[0]
-      else:
-        item=item[1]
     embed=discord.Embed(title=f"{item} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
     cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item)
@@ -891,7 +886,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
       embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount[i]*am}개\n보유중 : ({use_amount[i]*am})",value="\u200b")
     embed.set_thumbnail(url=url)
-  def vi():
+  def vi(item):
     button=ui.Button(style=ButtonStyle.green,label="제작하기",disabled=make.disable(종류.name,interaction.user.id,item,am))
     amount_button=ui.Button(style=ButtonStyle.red,label="갯수 변경")
     amount_button.callback=amount_button_callback
