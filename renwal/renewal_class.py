@@ -197,6 +197,7 @@ class MakeItem():
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
   def disable(self,name,id,data):
     ne,nea,ea,nu,nua,ua=self.callamount(name,id,data)
+    print(nea,ea,nua,ua)
     if nea>ea:
       return True
     if nua>ua:
