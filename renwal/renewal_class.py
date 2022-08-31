@@ -5,7 +5,6 @@ import pymysql
 import discord
 import os
 con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"])
-cur = con.cursor()
 #경험치바
 class Exp():
   def __init__(self,now,max):
@@ -45,6 +44,7 @@ class Reinforce():
     self.number=number
     self.rank=rank
   def require(self):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM rein_money WHERE `rank` = %s",(self.rank))
     money=cur.fetchone()[self.number+1]
     money=int(money)
@@ -53,6 +53,7 @@ class Reinforce():
     else:
       return False
   def rein(self):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM rein_percent WHERE `rank` = %s",(self.rank))
     percent=cur.fetchone()[self.number+1]
     percent=int(percent)
@@ -62,6 +63,7 @@ class Reinforce():
     else:
       return False
   def display(self):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM rein_money WHERE `rank` = %s",(self.rank))
     money=cur.fetchone()[self.number+1]
     money=int(money)
@@ -94,6 +96,7 @@ class MakeItem():
     if name=="기타":
       return self.etc(id,data)
   def itemlist(self,name):
+    cur=con.cursor()
     if name=="무기":
       cur.execute("SELECT * FROM make_weapon")
     if name=="방어구":
@@ -104,6 +107,7 @@ class MakeItem():
       cur.execute("SELECT * FROM make_etc")
     return cur.fetchall() 
   def weapon(self,id,name):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM make_weapon WHERE item_name = %s",name)
     make_item=cur.fetchone()
     if make_item[1]:
@@ -135,6 +139,7 @@ class MakeItem():
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def wear(self,id,name):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM make_wear WHERE item_name = %s ",name)
     make_item=cur.fetchone()
     if make_item[1]:
@@ -166,6 +171,7 @@ class MakeItem():
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
 
   def use(self,id,name):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM make_use WHERE item_name = %s ",name)
     make_item=cur.fetchone()
     if make_item[4]:
@@ -207,6 +213,7 @@ class MakeItem():
           return True
     return False
   def etc(self,id,name):
+    cur=con.cursor()
     cur.execute("SELECT * FROM make_etc WHERE item_name = %s",(name))
     make_item=cur.fetchone()
     if make_item[4]:
@@ -280,7 +287,7 @@ class Default():
   def __init__(self,id):
     self.id=id
   def isItem(self):
-
+    cur=con.cursor()
     li=['use','etc','cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS `{i}`(item_code INTEGER PRIMARY KEY, item_name INTEGER, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")
@@ -321,6 +328,7 @@ class Default():
     etc()
     con.commit()
   def isInventory(self):
+    cur=con.cursor()
     li=['_use','_etc','_cash']
     for i in li:
       cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}{i}`(item_code INTEGER PRIMARY KEY, item_name TEXT, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
@@ -328,10 +336,12 @@ class Default():
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_code INTEGER AUTO_INCREMENT PRIMARY KEY ,item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER , url TEXT)")
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
+    cur=con.cursor()
     cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(None,"초보자의 검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None))
     con.commit()
 
   def isLevel(self):
+    cur=con.cursor()
     cur.execute("SELECT exp,level FROM user_data WHERE id = %s",(self.id))
     exp,level=cur.fetchone()
     exp=int(exp)
@@ -374,12 +384,14 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
+      cur=con.cursor()
       cur.execute(f"UPDATE `{self.id}_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=%s",(code[i]))
       cur.execute(f"SELECT item_name FROM `{self.id}_etc` WHERE item_code = %s",(code[i]))
       name.append(cur.fetchone()[0])
     con.commit()
     return name,rand
   def use(self,enemy):
+    cur=con.cursor()
     code=enemy[10].split()
     percent=enemy[11].split()
     amount=enemy[12].split()
@@ -403,10 +415,12 @@ class Reward():
     con.commit()
     return name,rand
   def defualt(self):
+    cur=con.cursor()
     cur.execute(f"UPDATE user_data SET exp=exp+{self.exp}, money=money+{self.money} WHERE id = %s",(self.id))   
     con.commit() 
   def wear(self):
     if self.get():
+      cur=con.cursor()
       cur.execute(f"SELECT COUNT(*) FROM loot_table_wear WHERE floor=%s",(self.floor))
       amount = cur.fetchone()
       amount=int(amount[0])
@@ -434,6 +448,7 @@ class Reward():
     return None
   def weapon(self):
     if self.get():
+      cur=con.cursor()
       cur.execute(f"SELECT COUNT(*) FROM loot_table_weapon WHERE floor=%s",(self.floor))
       amount = cur.fetchone()
       amount=int(amount[0])
@@ -475,6 +490,7 @@ class Dungeon():
     if self.id in self.dic and self.dic[self.id]:
       return self.dic,"이미 던전에 있어요!"
     self.dic[self.id]=True
+    cur=con.cursor()
     cur.execute(f"SELECT COUNT(*) FROM enemy WHERE floor = {self.floor}")
     check = cur.fetchone()
     if int(check[0]) == 0:
@@ -482,6 +498,7 @@ class Dungeon():
       return self.dic,"몬스터를 만나지 못했어요!"
     return self.dic,None
   def stat(self):
+    cur=con.cursor()
     cur.execute(f"SELECT COUNT(*) FROM enemy WHERE floor = {self.floor}")
     check=cur.fetchone()
     r=random.randint(0,int(check[0])-1)
@@ -511,10 +528,12 @@ class ItemInventory():
     self.id = id
     self.value = value
   def item(self):
+    cur=con.cursor()
     cur.execute(f"SELECT * FROM `{self.id}{self.value}`")
     items=cur.fetchall()
     return items
   def display(self,item):
+    cur=con.cursor()
     item=list(item)
     if self.value=="_weapon":
       item.pop(0)
