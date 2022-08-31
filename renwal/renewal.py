@@ -840,6 +840,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   make=MakeItem()
   item=make.itemlist(종류.name)
   for i in item:
+    print(i)
     if 종류.name=="무기" or 종류.name=="방어구":
       select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=i[0])
     else:
