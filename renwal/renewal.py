@@ -674,7 +674,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
           embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
         dungeon_dic[interaction.user.id]=False
         await interaction.response.edit_message(embed=embed,view=view)
-    if interaction.response.is_done():
+    if interaction.user.name==client.user.name:
       await interaction.response.edit_message(embed=em(),view=vi())
     else:
       await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
@@ -859,6 +859,8 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     global am
     am=1
     await interaction.response.edit_message(embed=em(item,am),view=vi(item))
+  async def button_callback(interaction:Interaction):
+    pass
   async def amount_button_callback(interaction:Interaction):
     class amount_button_modal(ui.Modal, title="갯수 변경"):
       answer = ui.TextInput(label="숫자를 적어주세요.",max_length=4)
@@ -888,6 +890,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     return embed
   def vi(item):
     button=ui.Button(style=ButtonStyle.green,label="제작하기",disabled=make.disable(종류.name,interaction.user.id,item,am))
+    button.callback=button_callback
     amount_button=ui.Button(style=ButtonStyle.red,label="갯수 변경")
     amount_button.callback=amount_button_callback
     view=ui.View()
