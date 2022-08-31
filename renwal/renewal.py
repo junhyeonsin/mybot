@@ -852,7 +852,8 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     item=select.values[0]
     embed=discord.Embed(title=f"{item} 제작")
     embed.add_field(name="재료",value="\u200b",inline=False)
-    a= 1 if 종류.name=="무기" or 종류.name=="방어구" else 0
+    
+    cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item)
     need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
     for i in range(len(need_etc)):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
