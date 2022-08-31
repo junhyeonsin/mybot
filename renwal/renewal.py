@@ -674,11 +674,8 @@ async def dungeon(interaction:discord.Interaction,층:int):
           embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
         dungeon_dic[interaction.user.id]=False
         await interaction.response.edit_message(embed=embed,view=view)
-    print(interaction.user)
-    if interaction.user.name==client.user.name:
-      await interaction.response.edit_message(embed=em(),view=vi())
-    else:
-      await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
+    print(interaction.original_response)  
+    await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
   await callback(interaction)
 @tree.command(name="가이드", description="ㅇㅇ")
 async def Guide(interaction:discord.Interaction):
