@@ -196,8 +196,12 @@ class MakeItem():
       etc_amount=""
     return need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount
   def disable(self,name,id,data):
-    self.callamount(name,id,data)
-
+    ne,nea,ea,nu,nua,ua=self.callamount(name,id,data)
+    if nea>ea:
+      return True
+    if nua>ua:
+      return True
+    return False
   def etc(self,id,name):
     cur.execute(f"SELECT * FROM make_etc WHERE item_name = %s ",name)
     make_item=cur.fetchone()
