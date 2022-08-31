@@ -870,6 +870,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
           else:
             global am
             am=int(self.answer.value)
+            await interaction.response.edit_message(embed=em(item,am),view=vi())
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
     embed=discord.Embed(title=f"{item} 제작")
