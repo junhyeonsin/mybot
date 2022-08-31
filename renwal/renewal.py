@@ -892,7 +892,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     view.add_item(button)
     view.add_item(amount_button)
   select.callback=select_callback
-  await interaction.response.send_message(embed=em(),view=view,ephemeral=True)
+  await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
   if code=="아잉아잉0325":
