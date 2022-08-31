@@ -841,10 +841,10 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   item=make.itemlist(종류.name)
   for i in item:
     if 종류.name=="무기" or 종류.name=="방어구":
-      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=i)
+      select.add_option(label=f"[{i[5]}] Lv.{i[6]} {i[0]}",value=str(i))
     else:
       val=["거래가능","거래불가"]
-      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})",value=i)
+      select.add_option(label=f"{i[1]} ({val[0] if i[3] else val[1]})",value=str(i))
   view=ui.View()
   view.add_item(select)
   async def select_callback(interaction:Interaction):
