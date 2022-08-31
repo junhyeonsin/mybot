@@ -847,8 +847,9 @@ async def makeitem(interaction:Interaction,종류:mkItem):
   view=ui.View()
   view.add_item(select)
   async def select_callback(interaction:Interaction):
+    item=select.values[0].strip('][').split(", ")
     print(select.values[0])
-  select.callback=select_callback()
+  select.callback=select_callback
   await interaction.response.send_message(embed=embed,view=view,ephemeral=True)
 @tree.command(name="데이터", description="..")
 async def Command(interaction:discord.Interaction, code:str):
