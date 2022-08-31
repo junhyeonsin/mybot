@@ -477,203 +477,205 @@ async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
 dungeon_dic={}
 @tree.command(name="던전", description="던전입니다.")
 async def dungeon(interaction:discord.Interaction,층:int):
-  skill=Skill(interaction.user.id)
-  default = Default(interaction.user.id)
-  global dungeon_dic
-  DunGeon=Dungeon(interaction.user.id,dungeon_dic,층)
-  default.isInventory()
-  default.isItem()
-  skill.isSkill()
-  effect={}
-  dungeon_dic,content=DunGeon.go()
-  if content:
-    return await interaction.response.send_message(content=content,ephemeral=True)
-  global hp,mp,damage,enemy
-  dungeon_dic,hp,mp,damage,enemy=DunGeon.stat()
-  def em():
+  async def callback(interaction:Interaction):
+    skill=Skill(interaction.user.id)
+    default = Default(interaction.user.id)
+    global dungeon_dic
+    DunGeon=Dungeon(interaction.user.id,dungeon_dic,층)
+    default.isInventory()
+    default.isItem()
+    skill.isSkill()
+    effect={}
+    dungeon_dic,content=DunGeon.go()
+    if content:
+      return await interaction.response.send_message(content=content,ephemeral=True)
+    global hp,mp,damage,enemy
+    dungeon_dic,hp,mp,damage,enemy=DunGeon.stat()
+    def em():
 
-    effect_list=""
-    for key,value in effect.items():
-      name,value=skill.fight(key,value)
-      effect_list += f"{name}{value}"
-    embed=discord.Embed(title=f"{enemy[0]} {effect_list}")
-    embed.set_thumbnail(url=enemy[6])
-    embed.add_field(name=f"{enemy[1]}❤",value="\u200b",inline=True)
-    embed.add_field(name=f"{enemy[2]}⚔",value="\u200b",inline=True)
-    embed.add_field(name="나",value="\u200b",inline=False)
-    embed.add_field(name=f"{hp}❤",value="\u200b",inline=True)
-    embed.add_field(name=f"{mp}🔋",value="\u200b",inline=True)
-    embed.add_field(name=f"{damage.display()}⚔",value="\u200b",inline=True)
-    return embed 
-  def vi():
-    view=ui.View()
-    attack=ui.Button(style=discord.ButtonStyle.green,emoji="⚔",label="공격하기")
-    use=ui.Button(style=discord.ButtonStyle.gray,emoji="💊",label="아이템")
-    guard=ui.Button(style=discord.ButtonStyle.gray,emoji="🔮",label="스킬사용",disabled=skill.canskill())
-    run=ui.Button(style=discord.ButtonStyle.red,emoji="👟",label="도망가기",disabled=True)
-    view.add_item(attack)
-    view.add_item(use)
-    view.add_item(guard)
-    view.add_item(run)
-    attack.callback = attack_callback
-    guard.callback = skill_select_callback
-    use.callback= item_select_callback
-    return view
-  
-  async def item_select_callback(interaction:discord.Interaction):
-    embed= em()
-    cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM `{interaction.user.id}_use` WHERE item_code BETWEEN 1 AND 50 AND item_amount != 0")
-    getItem=cur.fetchall()
-    view = ui.View()
-    select = ui.Select(placeholder="아이템 사용",options=[SelectOption(label="돌아가기",value=-1)])
-    for i in range(len(getItem)):
-      select.options.append(SelectOption(label=f"{getItem[i][1]} {getItem[i][2]}개",value=getItem[i][0],description=("회복 아이템")))
-    view.add_item(select)
-    async def item_effect_callback(interaction:discord.Integration):
-      if int(select.values[0]) == -1:
-        await interaction.response.edit_message(embed=em(),view=vi())   
-    select.callback=item_effect_callback
-    await interaction.response.edit_message(embed=embed,view=view)
-  async def skill_select_callback(interaction:discord.Interaction):
-    embed= em()
-    cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{interaction.user.id}_skill` WHERE skill_level != 0 ")
-    getSkill=cur.fetchall()
-    view = ui.View()
-    select= ui.Select(placeholder="스킬 사용",options=[SelectOption(label="돌아가기",value=-1)])
-    for i in range(len(getSkill)):
-      if mp<getSkill[i][1] or hp<getSkill[i][2]:
-        pass
-      else:
-        select.options.append(SelectOption(label=getSkill[i][0],value=i,description=(f"마나소모:{getSkill[i][1]}" if getSkill[i][1] else "" + f"체력소모:{getSkill[i][2]}" if getSkill[i][2] else "")))
-    view.add_item(select)
-    async def skill_damage_callback(interaction:discord.Interaction):
-      if int(select.values[0]) == -1:
-        await interaction.response.edit_message(embed=em(),view=vi())   
-      else: 
-        global hp
-        global mp
-        global damage
-        global enemy
-        enemy=list(enemy)
-        cur.execute(f"SELECT * FROM `{interaction.user.id}_skill` LIMIT {select.values[0]},1")
-        info = cur.fetchone()
-        premyhp=hp
-        premydamage=damage.display()
-        preenemyhp=enemy[1]
-        emojis={}
-        preenemydamage=enemy[2]
-        li=[]
-        for key in effect.keys():
-          effect[key]-=1
-          emoji=skill.fight(key,0)[0]
-          hp,dam,enemy[1],enemy[2],value=skill.fighteffect(key,hp,damage.display(),enemy[1],enemy[2])
-          emojis[value]=emoji
-          if effect[key]==0:
-            li.append(key)
-        for i in li:
-          del effect[i]
-        mp-= info[2]
-        hp-= info[3]+enemy[2]
-        enemy[1] -= info[4]+ (damage.display()*info[5])
-        effect[info[6]]=info[7]
-        embed=em()
-        embed.add_field(name="**▫▫▫상태▫▫▫**",value="\u200b",inline=False)
-        try:
-          value
-        except NameError:
-          value=None
-        if not value=="stun":
-          embed.add_field(name=f"받은 데미지 {enemy[2]}💔",value='\u200b',inline=False)
-        embed.add_field(name=f"준 데미지 {info[4]+ (damage.display()*info[5])}🗡",value="\u200b",inline=False)
-        if preenemyhp>enemy[1]+info[4]+ (damage.display()*info[5]):
-          embed.add_field(name=f'준 데미지 {preenemyhp-(enemy[2]+info[4]+ (damage.display()*info[5]))}{emojis[value]}',value="\u200b",inline=False)
-        embed.set_thumbnail(url=info[9])
-        await end(interaction)
-        if not interaction.response.is_done():
-          await interaction.response.edit_message(embed=embed,view=vi())
-    select.callback=skill_damage_callback
-    await interaction.response.edit_message(embed=embed,view=view)
-
-  async def attack_callback(interaction:discord.Interaction):
-    global hp
-    global damage
-    global enemy
-    global mp
-    premyhp=hp
-    premydamage=damage
-    preenemyhp=enemy[1]
-    emojis={}
-    preenemydamage=enemy[2]
-    lists=[]
-    dam=0
-    enemy=list(enemy)
-    for key in effect.keys():
-      effect[key]-=1
-      emoji=skill.fight(key,0)[0]
-      hp,dam,enemy[1],enemy[2],value=skill.fighteffect(key,hp,damage.display(),enemy[1],enemy[2])
-      emojis[value]=emoji
-      if effect[key]==0:
-        lists.append(key)
-    for i in lists:
-      del effect[i]
-    d=damage.critical()
-    hp-=enemy[2]
-    enemy[1]-=d[0]
-    embed=em()
-    embed.add_field(name="**▫▫▫상태▫▫▫**",value="\u200b",inline=False)
-    try:
-      value
-    except NameError:
-      value=None
-    if not value=="stun":
-      embed.add_field(name=f"받은 데미지 {enemy[2]}💔",value='\u200b',inline=False)
-    name=f"준 데미지 {d[0]}🗡"
-    if d[1]:
-      name=f"준 데미지 **CRITICAL** {d[0]}🗡"
-    embed.add_field(name=name,value='\u200b',inline=False)
-    
-    if dam!=0 and value=="damage":
-      embed.add_field(name=f'준 데미지 {dam}{emojis[value]}',value="\u200b",inline=False)
-    await end(interaction)
-    if not interaction.response.is_done():
-      await interaction.response.edit_message(embed=embed)
-  async def end(interaction:discord.Interaction):
-    if hp<=0:
-      dungeon_dic[interaction.user.id]=False
-      embed=discord.Embed(title="사망")
-      embed.set_image(url="https://img.freepik.com/free-vector/game-over-in-retro-pixel-art-design-glitch-and-noise-style-isolated-on-white-background-concept-of-level-final-in-virtual-gaming-or-classic-user-interface-for-online-videogames-vector-illustration_342166-224.jpg%sw=740")
-      await interaction.response.edit_message(embed=embed,view=None)
-    if enemy[1]<=0:
-      embed=discord.Embed(title="전투 보상")
-      button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
-      button.callback=dungeon(interaction,층)
+      effect_list=""
+      for key,value in effect.items():
+        name,value=skill.fight(key,value)
+        effect_list += f"{name}{value}"
+      embed=discord.Embed(title=f"{enemy[0]} {effect_list}")
+      embed.set_thumbnail(url=enemy[6])
+      embed.add_field(name=f"{enemy[1]}❤",value="\u200b",inline=True)
+      embed.add_field(name=f"{enemy[2]}⚔",value="\u200b",inline=True)
+      embed.add_field(name="나",value="\u200b",inline=False)
+      embed.add_field(name=f"{hp}❤",value="\u200b",inline=True)
+      embed.add_field(name=f"{mp}🔋",value="\u200b",inline=True)
+      embed.add_field(name=f"{damage.display()}⚔",value="\u200b",inline=True)
+      return embed 
+    def vi():
       view=ui.View()
-      view.add_item(button)
-      reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
-      etcname,etcamount=reward.etc(enemy)
-      usename,useamount=reward.use(enemy)
-      rewardWeapon=reward.weapon()
-      reward.defualt()
-      rewardWear=reward.wear()
-      defualt=Default(interaction.user.id)
-      level=defualt.isLevel()
-      con.commit()
-      if level:
-        embed.add_field(name=f"**{level} 레벨** 달성!",value="\u200b",inline=False)
-
-      if rewardWeapon:
-        embed.add_field(name=f"[무기] **{rewardWeapon}**를 획득했습니다.",value='\u200b',inline=False)
-      if rewardWear:
-        embed.add_field(name=f"[장비] **{rewardWear}**를 획득했습니다.",value='\u200b',inline=False)
-      embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/988424121878741022/989064226083590145/chest.png")
-      embed.add_field(name=f"**{enemy[4]}골드 {enemy[5]}경험치**를 획득했습니다.",value="\u200b",inline=False)
-      for i in range(len(etcname)):
-        embed.add_field(name=f"[기타] **{etcname[i]} {etcamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
-      for i in range(len(usename)):
-        embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
-      dungeon_dic[interaction.user.id]=False
+      attack=ui.Button(style=discord.ButtonStyle.green,emoji="⚔",label="공격하기")
+      use=ui.Button(style=discord.ButtonStyle.gray,emoji="💊",label="아이템")
+      guard=ui.Button(style=discord.ButtonStyle.gray,emoji="🔮",label="스킬사용",disabled=skill.canskill())
+      run=ui.Button(style=discord.ButtonStyle.red,emoji="👟",label="도망가기",disabled=True)
+      view.add_item(attack)
+      view.add_item(use)
+      view.add_item(guard)
+      view.add_item(run)
+      attack.callback = attack_callback
+      guard.callback = skill_select_callback
+      use.callback= item_select_callback
+      return view
+    
+    async def item_select_callback(interaction:discord.Interaction):
+      embed= em()
+      cur.execute(f"SELECT item_code,item_name,item_amount,trade FROM `{interaction.user.id}_use` WHERE item_code BETWEEN 1 AND 50 AND item_amount != 0")
+      getItem=cur.fetchall()
+      view = ui.View()
+      select = ui.Select(placeholder="아이템 사용",options=[SelectOption(label="돌아가기",value=-1)])
+      for i in range(len(getItem)):
+        select.options.append(SelectOption(label=f"{getItem[i][1]} {getItem[i][2]}개",value=getItem[i][0],description=("회복 아이템")))
+      view.add_item(select)
+      async def item_effect_callback(interaction:discord.Integration):
+        if int(select.values[0]) == -1:
+          await interaction.response.edit_message(embed=em(),view=vi())   
+      select.callback=item_effect_callback
       await interaction.response.edit_message(embed=embed,view=view)
-  await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
+    async def skill_select_callback(interaction:discord.Interaction):
+      embed= em()
+      cur.execute(f"SELECT skill_name,skill_mana,skill_hp FROM `{interaction.user.id}_skill` WHERE skill_level != 0 ")
+      getSkill=cur.fetchall()
+      view = ui.View()
+      select= ui.Select(placeholder="스킬 사용",options=[SelectOption(label="돌아가기",value=-1)])
+      for i in range(len(getSkill)):
+        if mp<getSkill[i][1] or hp<getSkill[i][2]:
+          pass
+        else:
+          select.options.append(SelectOption(label=getSkill[i][0],value=i,description=(f"마나소모:{getSkill[i][1]}" if getSkill[i][1] else "" + f"체력소모:{getSkill[i][2]}" if getSkill[i][2] else "")))
+      view.add_item(select)
+      async def skill_damage_callback(interaction:discord.Interaction):
+        if int(select.values[0]) == -1:
+          await interaction.response.edit_message(embed=em(),view=vi())   
+        else: 
+          global hp
+          global mp
+          global damage
+          global enemy
+          enemy=list(enemy)
+          cur.execute(f"SELECT * FROM `{interaction.user.id}_skill` LIMIT {select.values[0]},1")
+          info = cur.fetchone()
+          premyhp=hp
+          premydamage=damage.display()
+          preenemyhp=enemy[1]
+          emojis={}
+          preenemydamage=enemy[2]
+          li=[]
+          for key in effect.keys():
+            effect[key]-=1
+            emoji=skill.fight(key,0)[0]
+            hp,dam,enemy[1],enemy[2],value=skill.fighteffect(key,hp,damage.display(),enemy[1],enemy[2])
+            emojis[value]=emoji
+            if effect[key]==0:
+              li.append(key)
+          for i in li:
+            del effect[i]
+          mp-= info[2]
+          hp-= info[3]+enemy[2]
+          enemy[1] -= info[4]+ (damage.display()*info[5])
+          effect[info[6]]=info[7]
+          embed=em()
+          embed.add_field(name="**▫▫▫상태▫▫▫**",value="\u200b",inline=False)
+          try:
+            value
+          except NameError:
+            value=None
+          if not value=="stun":
+            embed.add_field(name=f"받은 데미지 {enemy[2]}💔",value='\u200b',inline=False)
+          embed.add_field(name=f"준 데미지 {info[4]+ (damage.display()*info[5])}🗡",value="\u200b",inline=False)
+          if preenemyhp>enemy[1]+info[4]+ (damage.display()*info[5]):
+            embed.add_field(name=f'준 데미지 {preenemyhp-(enemy[2]+info[4]+ (damage.display()*info[5]))}{emojis[value]}',value="\u200b",inline=False)
+          embed.set_thumbnail(url=info[9])
+          await end(interaction)
+          if not interaction.response.is_done():
+            await interaction.response.edit_message(embed=embed,view=vi())
+      select.callback=skill_damage_callback
+      await interaction.response.edit_message(embed=embed,view=view)
+
+    async def attack_callback(interaction:discord.Interaction):
+      global hp
+      global damage
+      global enemy
+      global mp
+      premyhp=hp
+      premydamage=damage
+      preenemyhp=enemy[1]
+      emojis={}
+      preenemydamage=enemy[2]
+      lists=[]
+      dam=0
+      enemy=list(enemy)
+      for key in effect.keys():
+        effect[key]-=1
+        emoji=skill.fight(key,0)[0]
+        hp,dam,enemy[1],enemy[2],value=skill.fighteffect(key,hp,damage.display(),enemy[1],enemy[2])
+        emojis[value]=emoji
+        if effect[key]==0:
+          lists.append(key)
+      for i in lists:
+        del effect[i]
+      d=damage.critical()
+      hp-=enemy[2]
+      enemy[1]-=d[0]
+      embed=em()
+      embed.add_field(name="**▫▫▫상태▫▫▫**",value="\u200b",inline=False)
+      try:
+        value
+      except NameError:
+        value=None
+      if not value=="stun":
+        embed.add_field(name=f"받은 데미지 {enemy[2]}💔",value='\u200b',inline=False)
+      name=f"준 데미지 {d[0]}🗡"
+      if d[1]:
+        name=f"준 데미지 **CRITICAL** {d[0]}🗡"
+      embed.add_field(name=name,value='\u200b',inline=False)
+      
+      if dam!=0 and value=="damage":
+        embed.add_field(name=f'준 데미지 {dam}{emojis[value]}',value="\u200b",inline=False)
+      await end(interaction)
+      if not interaction.response.is_done():
+        await interaction.response.edit_message(embed=embed)
+    async def end(interaction:discord.Interaction):
+      if hp<=0:
+        dungeon_dic[interaction.user.id]=False
+        embed=discord.Embed(title="사망")
+        embed.set_image(url="https://img.freepik.com/free-vector/game-over-in-retro-pixel-art-design-glitch-and-noise-style-isolated-on-white-background-concept-of-level-final-in-virtual-gaming-or-classic-user-interface-for-online-videogames-vector-illustration_342166-224.jpg%sw=740")
+        await interaction.response.edit_message(embed=embed,view=None)
+      if enemy[1]<=0:
+        embed=discord.Embed(title="전투 보상")
+        button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=True)
+        button.callback=callback
+        view=ui.View()
+        view.add_item(button)
+        reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
+        etcname,etcamount=reward.etc(enemy)
+        usename,useamount=reward.use(enemy)
+        rewardWeapon=reward.weapon()
+        reward.defualt()
+        rewardWear=reward.wear()
+        defualt=Default(interaction.user.id)
+        level=defualt.isLevel()
+        con.commit()
+        if level:
+          embed.add_field(name=f"**{level} 레벨** 달성!",value="\u200b",inline=False)
+
+        if rewardWeapon:
+          embed.add_field(name=f"[무기] **{rewardWeapon}**를 획득했습니다.",value='\u200b',inline=False)
+        if rewardWear:
+          embed.add_field(name=f"[장비] **{rewardWear}**를 획득했습니다.",value='\u200b',inline=False)
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/988424121878741022/989064226083590145/chest.png")
+        embed.add_field(name=f"**{enemy[4]}골드 {enemy[5]}경험치**를 획득했습니다.",value="\u200b",inline=False)
+        for i in range(len(etcname)):
+          embed.add_field(name=f"[기타] **{etcname[i]} {etcamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
+        for i in range(len(usename)):
+          embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
+        dungeon_dic[interaction.user.id]=False
+        await interaction.response.edit_message(embed=embed,view=view)
+    await interaction.response.send_message(embed=em(),view=vi(),ephemeral=True)
+  await callback(interaction)
 @tree.command(name="가이드", description="ㅇㅇ")
 async def Guide(interaction:discord.Interaction):
   embed=discord.Embed(title="MOTD")
