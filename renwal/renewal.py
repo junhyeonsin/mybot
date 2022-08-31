@@ -25,6 +25,8 @@ class MyClient(discord.Client):
     await self.wait_until_ready()
     await tree.sync()
     print(f"{self.user} 에 로그인하였습니다!")
+    channel=self.get_channel(955246009427038261)
+    await channel.send("재시작됨")
     self.daily_message.start()
     await self.bt(["코드 최적화","그림쟁이 구","개발 연기"])
   async def on_member_join(self,member:discord.Member):
