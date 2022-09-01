@@ -780,6 +780,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
 #@tree.command(name="전직", description="전직을 할수 있습니다.")
 @tree.command(name="스킬", description="스킬을 찍을수 있습니다.")
 async def 스킬(interaction:discord.Interaction):
+  cur=con.cursor()
   skill=Skill(interaction.user.id)
   skill.isSkill()
   view = ui.View()
@@ -788,7 +789,7 @@ async def 스킬(interaction:discord.Interaction):
     select.options.append(SelectOption(label=(f"(Lv. {skill.select()[i][3]}) {skill.select()[i][0]} ({skill.select()[i][1]}/{skill.select()[i][2]})"),value=i))
   view.add_item(select)
   def func():
-    cur=con.cursor()
+    con.commit()
     embed=discord.Embed(title="스킬 정보")
     info=list(skill.display(select.values[0]))
     info[8]=Class(info[8]).display()
