@@ -846,7 +846,7 @@ async def modal(interaction:discord.Interaction):
 async def makeitem(interaction:Interaction,종류:mkItem):
   embed=discord.Embed(title="아이템 제작소")
   select=ui.Select(placeholder="아이템제작")
-  make=MakeItem()
+  make=MakeItem(interaction.user.id)
   item=make.itemlist(종류.name)
   for i in item:
     if 종류.name=="무기" or 종류.name=="방어구":
@@ -886,10 +886,10 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
     for i in range(len(need_etc)):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {int(need_etc_amount[i])*am}개\n보유중 : ({etc_amount[i]})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]}\n{int(need_etc_amount[i])*am}개\n보유중 : ({etc_amount[i]})",value="\u200b")
     for i in range(len(need_use)):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {int(need_use_amount[i])*am}개\n보유중 : ({use_amount[i]})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]}\n{int(need_use_amount[i])*am}개\n보유중 : ({use_amount[i]})",value="\u200b")
     embed.set_thumbnail(url=url)
     return embed
   def vi(item):

@@ -82,10 +82,18 @@ class Modify():
     return stat[stat_colum.index(self.arg)]
 
 class MakeItem():
-  def __init__(self):
+  def __init__(self,id):
     checking=Default(id)
     checking.isInventory()
     checking.isItem()
+  def make(self,name,id,data,am):
+    cur=con.cursor()
+    ne,nea,ea,nu,nua,ua=self.callamount(name,id,data)
+    for i in range(len(ne)):
+      cur.execute(f"UPDATE `{id}_etc` SET item_amount=item_amount-{int(nea[i])*am} WHERE item_code={ne[i]}")
+    for i in range(len(nu)):
+      cur.execute(f"UPDATE `{id}_use` SET item_amount=item_amount-{int(nua[i])*am} WHERE item_code={nu[i]}")
+    con.commit()    
   def callamount(self,name,id,data):
     if name=="무기":
       return self.weapon(id,data)
