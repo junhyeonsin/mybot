@@ -41,7 +41,6 @@ class MyClient(discord.Client):
             await client.change_presence(status = discord.Status.online, activity = discord.Game(g))
             await asyncio.sleep(5)
 con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"],connect_timeout=120)
-cur = con.cursor()
 class reportModal(ui.Modal, title="건의"):
   answer=ui.TextInput(
         custom_id="생성",
@@ -52,6 +51,7 @@ class reportModal(ui.Modal, title="건의"):
         max_length=500,
       )  
   async def on_submit(self, interaction: discord.Interaction):
+    cur=con.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS report(value TEXT,user TEXT)")
     cur.execute("INSERT INTO report VALUES(%s,%s)",(self.answer.value,interaction.user.id))
     con.commit()
@@ -267,6 +267,7 @@ async def skipmusic(interaction:Interaction,갯수:int=1):
 #/생성 <닉네임>
 @tree.command(name="생성", description="아이디를 생성합니다.")
 async def register(interaction: discord.Interaction, 닉네임: str):
+  cur=con.cursor()
   embed = discord.Embed(title="아이디 생성")
   value=""
   if len(닉네임) > 10 and len(닉네임)<=2:
@@ -296,6 +297,7 @@ async def register(interaction: discord.Interaction, 닉네임: str):
 #/정보 <유저>  
 @tree.command(name="정보", description="캐릭터 정보를 확인합니다.")
 async def info(interaction:discord.Interaction, 유저 : discord.Member):
+  cur=con.cursor()
   cur.execute("SELECT * FROM user_data WHERE id = %s",(유저.id))
   check=cur.fetchone()
   if not check:
@@ -368,6 +370,7 @@ async def dungeonreset(interaction:Interaction):
 #/스텟 <스텟> <포인트>
 @tree.command(name="스텟", description="스테이터스를 올립니다.")
 async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int ):
+  cur=con.cursor()
   cur.execute("SELECT stat_point,hp FROM user_stat WHERE id = %s",(interaction.user.id))
   check=cur.fetchone()
   if check[0]==0:
@@ -396,6 +399,7 @@ async def status(interaction:discord.Interaction, 스텟:Status, 포인트:int )
 #/강화소 <장비>
 @tree.command(name="강화소", description="착용중인 아이템을 강화합니다.")
 async def reinforcement(interaction: discord.Interaction, 장비:ReinforceItem):
+  cur=con.cursor()
   if 장비.value != 0:
     cur.execute(f"SELECT * FROM `{interaction.user.id}_wear` WHERE part = %s AND wear = %s ",(장비.value,1))
   else:
@@ -478,6 +482,7 @@ message_dic={}
 @tree.command(name="던전", description="던전입니다.")
 async def dungeon(interaction:discord.Interaction,층:int):
   async def callback(interaction:Interaction):
+    cur=con.cursor()
     skill=Skill(interaction.user.id)
     default = Default(interaction.user.id)
     global dungeon_dic
@@ -690,6 +695,7 @@ async def Guide(interaction:discord.Interaction):
 @tree.command(name="인벤토리", description="인벤토리를 엽니다.")
 async def Inventory(interaction:discord.Interaction, 종류:Inventory):
   async def inventory_callback(interaction:discord.Interaction):
+    cur=con.cursor()
     embed=discord.Embed(title=f"{종류.name} 인벤토리")
     inventory=ItemInventory(interaction.user.id,종류.value)
     item=inventory.item()
@@ -821,6 +827,7 @@ async def 스킬(interaction:discord.Interaction):
 
 @tree.command(name="계정삭제", description="계정과 관련된 모든 데이터가 삭제됩니다.")
 async def Cut(interaction:discord.Interaction,sure:bool):
+  cur=con.cursor()
   if sure:
     view = ui.View()
     button=ui.Button(label="네.",style=ButtonStyle.danger)
@@ -845,6 +852,7 @@ async def modal(interaction:discord.Interaction):
 
 @tree.command(name="제작",description="아이템제작")
 async def makeitem(interaction:Interaction,종류:mkItem):
+  cur=con.cursor()
   embed=discord.Embed(title="아이템 제작소")
   select=ui.Select(placeholder="아이템제작")
   make=MakeItem(interaction.user.id)
