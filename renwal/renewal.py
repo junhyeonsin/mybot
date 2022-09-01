@@ -868,7 +868,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     embed=discord.Embed(title="아이템 제작 결과")
     embed.add_field(name=f"[{종류.name}] {item_global} {am}개 제작성공")
     embed.set_thumbnail(url=cur.fetchone()[0])
-    await interaction.response.edit_message(embed=embed)
+    await interaction.response.edit_message(embed=embed,view=None)
     await asyncio.sleep(7)
     await interaction.delete_original_response()
   async def amount_button_callback(interaction:Interaction):
