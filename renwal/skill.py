@@ -82,6 +82,7 @@ class skillModify():
     print(point)
     cur=con.cursor()
     cur.execute(f"UPDATE user_stat SET skill_point=skill_point-{point} WHERE id = %s ",(self.id))
+    con.commit()
     cur.execute(f"SELECT skill_point FROM user_stat WHERE id = %s",self.id)
     p=cur.fetchone()[0]
     print(p)

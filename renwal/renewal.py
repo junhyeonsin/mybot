@@ -815,7 +815,6 @@ async def 스킬(interaction:discord.Interaction):
     modify.upgrade(info[1],info[11],info[10])    
     await interaction.response.edit_message(embed=func()[0],view=func()[1])
   async def select_callback(interaction:discord.Interaction):
-    
     await interaction.response.edit_message(embed=func()[0],view=func()[1])
   select.callback=select_callback
   await interaction.response.send_message(view=view,ephemeral=True)
