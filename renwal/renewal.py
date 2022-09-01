@@ -782,6 +782,7 @@ async def 스킬(interaction:discord.Interaction):
     select.options.append(SelectOption(label=(f"(Lv. {skill.select()[i][3]}) {skill.select()[i][0]} ({skill.select()[i][1]}/{skill.select()[i][2]})"),value=i))
   view.add_item(select)
   def func():
+    cur=con.cursor()
     embed=discord.Embed(title="스킬 정보")
     info=list(skill.display(select.values[0]))
     info[8]=Class(info[8]).display()
