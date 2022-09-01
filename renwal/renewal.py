@@ -718,7 +718,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
       a=["_weapon","_wear"]
       var="(착용중)"
       empty=""
-      options=[SelectOption(label=(f"[{item[i][0]}] Lv.{item[i][3]} +{item[i][2]} {item[i][1]} {var if item[i][14+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
+      options=[SelectOption(label=(f"[{item[i][0]}] Lv.{item[i][4]} {item[i][3]} +{item[i][2]} {item[i][1]} {var if item[i][14+a.index(inventory.value)] else empty}") ,value =i) for i in range(len(item))]
     else:
       var="거래가능"
       val="거래불가"
