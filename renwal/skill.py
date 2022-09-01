@@ -84,6 +84,7 @@ class skillModify():
     cur.execute(f"UPDATE user_stat SET skill_point=skill_point-{point} WHERE id = %s ",(self.id))
     cur.execute(f"SELECT skill_point FROM user_stat WHERE id = %s",self.id)
     p=cur.fetchone()[0]
+    print(p)
     cur.execute(f"SELECT * FROM skill WHERE skill_id = %s AND skill_level = %s ",(id,level+1))
     info=list(cur.fetchone())
     cur.execute(f"DELETE FROM `{self.id}_skill` WHERE skill_id = %s",(id))

@@ -721,7 +721,7 @@ async def Inventory(interaction:discord.Interaction, 종류:Inventory):
     view.add_item(select)
 
     async def equip_callback(interaction:discord.Interaction):
-      print(item[int(select.values[0])][0])
+#      print(item[int(select.values[0])][0])
       if inventory.value=="_weapon":
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 0 WHERE wear = 1")
         cur.execute(f"UPDATE `{interaction.user.id}{inventory.value}` SET wear = 1 WHERE item_code = {item[int(select.values[0])][0]}")
@@ -884,7 +884,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
           else:
             global am
             am=int(self.answer.value)
-            print(item_global)
+#            print(item_global)
             await interaction.response.edit_message(embed=em(item_global,am),view=vi(item_global))
     await interaction.response.send_modal(amount_button_modal())
   def em(item,am):
