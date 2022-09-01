@@ -678,7 +678,6 @@ async def dungeon(interaction:discord.Interaction,층:int):
           embed.add_field(name=f"[기타] **{etcname[i]} {etcamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
         for i in range(len(usename)):
           embed.add_field(name=f"[소비] **{usename[i]} {useamount[i]}개**를 획득했습니다.",value='\u200b',inline=False)
-        dungeon_dic[interaction.user.id]=False
         await interaction.response.edit_message(embed=embed,view=view)
     if message_dic[str(interaction.user.id)]:
       await interaction.response.edit_message(embed=em(),view=vi())
