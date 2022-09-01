@@ -74,6 +74,7 @@ class skillModify():
     else:
       return value
   def upgrade(self,id,level,point):
+    print(point)
     cur.execute(f"UPDATE user_stat SET skill_point=skill_point-{point} WHERE id = %s ",(self.id))
     cur.execute(f"SELECT * FROM skill WHERE skill_id = %s AND skill_level = %s ",(id,level+1))
     con.commit()
