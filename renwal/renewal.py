@@ -864,10 +864,13 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     await interaction.response.edit_message(embed=em(item,am),view=vi(item))
   async def button_callback(interaction:Interaction):
     make.make(종류.name,interaction.user.id,item_global,am)
-    cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item)
+    cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item_global)
     embed=discord.Embed(title="아이템 제작 결과")
     embed.add_field(name=f"[{종류.name}] {item_global} {am}개 제작성공")
     embed.set_thumbnail(url=cur.fetchone()[0])
+    await interaction.response.edit_message(embed=embed)
+    await asyncio.sleep(7)
+    await interaction.delete_original_response()
   async def amount_button_callback(interaction:Interaction):
     class amount_button_modal(ui.Modal, title="갯수 변경"):
       answer = ui.TextInput(label="숫자를 적어주세요.",max_length=4)
