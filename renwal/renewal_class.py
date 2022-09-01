@@ -94,6 +94,17 @@ class MakeItem():
     for i in range(len(nu)):
       cur.execute(f"UPDATE `{id}_use` SET item_amount=item_amount-{int(nua[i])*am} WHERE item_code={nu[i]}")
     con.commit()    
+    if name=="무기":
+      category="_weapon"
+    elif name=="방어구":
+      category="_wear"
+    elif name=="소비":
+      category="_use"
+    else:
+      category="_etc"
+    if name=="소비" or name=="기타": 
+      cur.execute(f"UPDATE {str(id)}{category} SET item_amount=item_amount+{am} WHERE item_name={data}")
+      con.commit()
   def callamount(self,name,id,data):
     if name=="무기":
       return self.weapon(id,data)
