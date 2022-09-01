@@ -103,7 +103,7 @@ class MakeItem():
     else:
       category="_etc"
     if name=="소비" or name=="기타": 
-      cur.execute(f"UPDATE `{id}{category}` SET item_amount=item_amount+{am} WHERE item_name={data}")
+      cur.execute(f"UPDATE `{id}{category}` SET item_amount=item_amount+{am} WHERE item_name=%s",name)
       con.commit()
   def callamount(self,name,id,data):
     if name=="무기":
