@@ -866,7 +866,7 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     make.make(종류.name,interaction.user.id,item_global,am)
     cur.execute(f"SELECT url FROM make{종류.value} WHERE item_name = %s",item_global)
     embed=discord.Embed(title="아이템 제작 결과")
-    embed.add_field(name=f"[{종류.name}] {item_global} {am}개 제작성공")
+    embed.add_field(name=f"[{종류.name}] {item_global} {am}개 제작성공",value="\u200b")
     embed.set_thumbnail(url=cur.fetchone()[0])
     await interaction.response.edit_message(embed=embed,view=None)
     await asyncio.sleep(7)
