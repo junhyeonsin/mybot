@@ -886,10 +886,10 @@ async def makeitem(interaction:Interaction,종류:mkItem):
     need_etc,need_etc_amount,etc_amount,need_use,need_use_amount,use_amount=make.callamount(종류.name,interaction.user.id,item)
     for i in range(len(need_etc)):
       cur.execute(f"SELECT item_name FROM etc WHERE item_code = {need_etc[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {need_etc_amount[i]*am}개\n보유중 : ({etc_amount[i]*am})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]} {int(need_etc_amount[i])*am}개\n보유중 : ({etc_amount[i]*am})",value="\u200b")
     for i in range(len(need_use)):
       cur.execute(f"SELECT item_name FROM `use` WHERE item_code = {need_use[i]}")
-      embed.add_field(name=f"{cur.fetchone()[0]} {need_use_amount[i]*am}개\n보유중 : ({use_amount[i]*am})",value="\u200b")
+      embed.add_field(name=f"{cur.fetchone()[0]} {int(need_use_amount[i])*am}개\n보유중 : ({use_amount[i]*am})",value="\u200b")
     embed.set_thumbnail(url=url)
     return embed
   def vi(item):
