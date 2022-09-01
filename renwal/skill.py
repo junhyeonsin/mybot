@@ -88,3 +88,4 @@ class skillModify():
     cur.execute(f"DELETE FROM `{self.id}_skill` WHERE skill_id = %s",(id))
     cur.execute(f"INSERT INTO `{self.id}_skill` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(info))
     con.commit()
+    return
