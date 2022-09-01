@@ -787,8 +787,6 @@ async def 스킬(interaction:discord.Interaction):
     info[8]=Class(info[8]).display()
     info[6]=skillModify(interaction.user.id).effect(info[6])
     name=['스킬명',"",'마나소모량','체력소모량','스킬데미지','계수','효과','지속시간','직업',"",'스킬포인트','스킬레벨',"최대레벨","요구레벨"]
-    cur.execute("SELECT skill_point FROM user_stat WHERE id = %s",(interaction.user.id))
-    point=cur.fetchone()[0]
     for i in range(len(info)):
       if i == 6:
         embed.add_field(name="\u200b",value="\u200b")
@@ -801,6 +799,9 @@ async def 스킬(interaction:discord.Interaction):
         pass
       else:
         embed.add_field(name=name[i],value=info[i])
+    cur.execute("SELECT skill_point FROM user_stat WHERE id = %s",(interaction.user.id))
+    point=cur.fetchone()[0]
+    print(point)
     embed.set_footer(text=f"남은 스킬포인트: {point}")
     view=ui.View()
     button=ui.Button(style=ButtonStyle.green,label="스킬레벨업⬆",disabled=skill.require(select.values[0]))
@@ -813,7 +814,7 @@ async def 스킬(interaction:discord.Interaction):
     modify.upgrade(info[1],info[11],info[10])    
     await interaction.response.edit_message(embed=func()[0],view=func()[1])
   async def select_callback(interaction:discord.Interaction):
-
+    
     await interaction.response.edit_message(embed=func()[0],view=func()[1])
   select.callback=select_callback
   await interaction.response.send_message(view=view,ephemeral=True)
