@@ -16,7 +16,7 @@ from skill import Skill, skillModify
 
 KST=datetime.timezone(datetime.timedelta(hours=9))
 class MyClient(discord.Client):
-  @tasks.loop(time=datetime.time(hour=8,minute=0,second=0,tzinfo=KST))
+  @tasks.loop(time=datetime.time(hour=9,minute=0,second=0,tzinfo=KST))
   async def daily_message(self):
     channel=self.get_channel(955246009427038261)
     await channel.send("9시")
