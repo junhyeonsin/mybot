@@ -162,7 +162,7 @@ async def queuelist(interaction:Interaction):
     embed.set_footer(text=f"Page : {page}")
     return embed
   def vi():
-    view= ui.View(9999999)
+    view= ui.View(None)
     undo = ui.Button(style=ButtonStyle.green,label="이전으로",disabled=(True if page==1 else False))
     next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue[guild]) <= page*10 else False))
     refresh= ui.Button(style=ButtonStyle.red,label="새로고침")
