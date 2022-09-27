@@ -46,11 +46,11 @@ class MyClient(discord.Client):
       if not check:
         cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
         con.commit()
-        check=True
+        check=(True)
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
       print(guild_emoji)
       #guild_emoji=discord.utils.get(guild.emojis,id=int(emoji_id))
-      if guild_emoji and check[1]:
+      if guild_emoji and check[0]:
         def is_user(m:discord.Message):
           return True if m.author==message.author else False
         embed=discord.Embed(color=message.author.color)
