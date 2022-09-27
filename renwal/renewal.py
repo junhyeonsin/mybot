@@ -15,7 +15,9 @@ from skill import Skill, skillModify
 import re
 
 con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"],connect_timeout=120)
-
+class onoff(enum.Enum):
+  온=1
+  오프=0
 KST=datetime.timezone(datetime.timedelta(hours=9))
 class MyClient(discord.Client):
   @tasks.loop(time=datetime.time(hour=9,minute=0,second=0,tzinfo=KST))
@@ -163,6 +165,22 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 queue={}
+@tree.command(name="이모지", description="이모지 확대기능 온오프")
+async def emojionoff(interaction:Interaction,온오프:onoff):
+  if interaction.user.guild_permissions.manage_messages:
+    cur=con.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD INTEGER PRIMARY KEY,ONOFF BOOL)")
+    cur.execute("SELECT * FROM onoff WHERE GUILD = ?",(interaction.guild.id,))
+    check = cur.fetchone()
+    if not check:
+      print(check)
+      cur.execute("INSERT INTO onoff VALUES(?,?)",(interaction.guild.id,True,),)
+      con.commit()
+    cur.execute(f"UPDATE onoff SET ONOFF = {온오프.value}  WHERE GUILD={interaction.guild.id}")
+    con.commit()
+    await interaction.response.send_message(f"이모지 확대 기능이 {온오프.name} 되었습니다.",ephemeral=True)
+  else:
+    await interaction.response.send_message("권한이 없어요!",ephemeral=True)
 
 def nextsong(interaction:Interaction,error):
   print(error)
