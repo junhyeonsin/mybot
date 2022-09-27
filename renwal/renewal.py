@@ -46,9 +46,9 @@ class MyClient(discord.Client):
       if not check:
         cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
         con.commit()
-        cur.execute("SELECT * FROM onoff WHERE GUILD = %s",(guild.id,))
-        check=cur.fetchone()
+        check=True
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
+      print(guild_emoji)
       #guild_emoji=discord.utils.get(guild.emojis,id=int(emoji_id))
       if guild_emoji and check[1]:
         def is_user(m:discord.Message):
