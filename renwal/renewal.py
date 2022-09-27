@@ -12,7 +12,9 @@ from discord import Colour, Interaction, ui,app_commands,Button,ButtonStyle,Sele
 from discord.ext import commands
 from renewal_class import *
 from skill import Skill, skillModify
+import re
 
+con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"],connect_timeout=120)
 
 KST=datetime.timezone(datetime.timedelta(hours=9))
 class MyClient(discord.Client):
@@ -28,6 +30,34 @@ class MyClient(discord.Client):
     await channel.send("재시작됨")
     self.daily_message.start()
     await self.bt(["코드 최적화","그림쟁이 구","개발 연기"])
+  async def on_message(self,message:discord.Message):
+    if message.author == self.user:
+      return False
+    emoji="".join(re.compile("[:a-zA-Z]").findall(message.content))
+    r=re.sub("[^a-zA-Z]","",message.content).strip()
+    if emoji == f":{r}:":
+      guild=message.author.guild
+      emoji_id=message.content.split(":")[2]
+      emoji_id=emoji_id.replace(">","")
+      cur=con.cursor()
+      cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD INTEGER PRIMARY KEY,ONOFF BOOL)")
+      cur.execute("SELECT * FROM onoff WHERE GUILD = ?",(guild.id,))
+      check=cur.fetchone()
+      if not check:
+        cur.execute("INSERT INTO onoff VALUES(?,?)",(guild.id,True,))
+        con.commit()
+        cur.execute("SELECT * FROM onoff WHERE GUILD = ?",(guild.id,))
+        check=cur.fetchone()
+      guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
+      #guild_emoji=discord.utils.get(guild.emojis,id=int(emoji_id))
+      if guild_emoji and check[1]:
+        def is_user(m:discord.Message):
+          return True if m.author==message.author else False
+        embed=discord.Embed(color=message.author.color)
+        embed.set_author(name=message.author.display_name,icon_url=message.author.avatar)
+        embed.set_image(url=guild_emoji.url)
+        await message.channel.purge(limit=1,check=is_user)
+        await message.channel.send(embed=embed)
   async def on_member_join(self,member:discord.Member):
     try:
       guild=member.guild
@@ -40,7 +70,6 @@ class MyClient(discord.Client):
         for g in items:
             await client.change_presence(status = discord.Status.online, activity = discord.Game(g))
             await asyncio.sleep(5)
-con=pymysql.connect(user=os.environ['user'],password=os.environ['password'],host=os.environ["host"],charset="utf8",database=os.environ["database"],connect_timeout=120)
 class reportModal(ui.Modal, title="건의"):
   answer=ui.TextInput(
         custom_id="생성",
@@ -99,7 +128,7 @@ tree = app_commands.CommandTree(client)
 youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'outtmpl': 'musics/%(id)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
