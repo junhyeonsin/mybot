@@ -44,7 +44,7 @@ class MyClient(discord.Client):
       cur.execute("SELECT * FROM onoff WHERE GUILD = %s",(guild.id,))
       check=cur.fetchone()
       if not check:
-        cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
+        #cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
         con.commit()
         check=(True)
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
