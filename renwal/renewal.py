@@ -40,7 +40,7 @@ class MyClient(discord.Client):
       emoji_id=message.content.split(":")[2]
       emoji_id=emoji_id.replace(">","")
       cur=con.cursor()
-      cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD INTEGER PRIMARY KEY,ONOFF BOOL)")
+      cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD BIGINT PRIMARY KEY,ONOFF BOOL)")
       cur.execute("SELECT * FROM onoff WHERE GUILD = %s",(guild.id,))
       check=cur.fetchone()
       if not check:
