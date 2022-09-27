@@ -50,7 +50,6 @@ class MyClient(discord.Client):
         con.commit()
         check=(True,0)
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
-      print(check)
       #guild_emoji=discord.utils.get(guild.emojis,id=int(emoji_id))
       if guild_emoji and check[0]:
         def is_user(m:discord.Message):
