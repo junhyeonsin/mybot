@@ -42,15 +42,15 @@ class MyClient(discord.Client):
       cur=con.cursor()
       cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD BIGINT PRIMARY KEY,ONOFF BOOL)")
       cur.execute("SELECT * FROM onoff WHERE GUILD = %s",(guild.id,))
-      check=cur.fetchone()
+      check=cur.fetchone()[0]
       if not check:
         cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
         con.commit()
-        check=(True)
+        check=True
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
       print(guild_emoji)
       #guild_emoji=discord.utils.get(guild.emojis,id=int(emoji_id))
-      if guild_emoji and check[0]:
+      if guild_emoji and check:
         def is_user(m:discord.Message):
           return True if m.author==message.author else False
         embed=discord.Embed(color=message.author.color)
