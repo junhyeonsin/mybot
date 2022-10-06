@@ -195,6 +195,10 @@ def nextsong(interaction:Interaction,error):
 @tree.command(name="queue", description="노래 리스트")
 async def queuelist(interaction:Interaction):
   guild=str(interaction.guild.id)
+  try:
+    queue[guild]
+  except KeyError:
+    queue[guild]=[]
   if len(queue[guild])==0:
     return await interaction.response.send_message("음악이 없어요!",ephemeral=True)
   global page
@@ -538,7 +542,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
     effect={}
     print(dungeon_dic)
     dungeon_dic,content=DunGeon.go()
-    print(dungeon_dic)
+    print(dungeon_dic)  
     if content:
       return await interaction.response.send_message(content=content,ephemeral=True)
     global hp,mp,damage,enemy
@@ -701,7 +705,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
         button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
         button.callback=callback
         message_dic[str(interaction.user.id)]=True
-        dungeon_dic[str(interaction.user.id)]=False
+        dungeon_dic[interaction.user.id]=False
         view=ui.View()
         view.add_item(button)
         reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
