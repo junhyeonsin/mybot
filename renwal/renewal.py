@@ -699,6 +699,7 @@ async def dungeon(interaction:discord.Interaction,층:int):
         button=ui.Button(label="다시 탐험",style=ButtonStyle.green,disabled=False)
         button.callback=callback
         message_dic[str(interaction.user.id)]=True
+        dungeon_dic[str(interaction.user.id)]=False
         view=ui.View()
         view.add_item(button)
         reward=Reward(층,interaction.user.id,enemy[5],enemy[4])
