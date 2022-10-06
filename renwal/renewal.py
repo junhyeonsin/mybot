@@ -46,7 +46,7 @@ class MyClient(discord.Client):
       cur.execute("SELECT ONOFF FROM onoff WHERE GUILD = %s",(guild.id))
       check=cur.fetchone()
       if not check:
-        cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True,))
+        cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True))
         con.commit()
         check=(True,0)
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
@@ -182,9 +182,8 @@ async def emojionoff(interaction:Interaction,온오프:onoff):
     await interaction.response.send_message("권한이 없어요!",ephemeral=True)
 
 def nextsong(interaction:Interaction,error):
-  print(error)
   guild=str(interaction.guild.id)
-  print(f"end : {guild}")
+  folder = './music_files'
   voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
   if len(queue[guild])>0:
     queue[guild].pop(0)
@@ -208,7 +207,7 @@ async def queuelist(interaction:Interaction):
     embed.set_footer(text=f"Page : {page}")
     return embed
   def vi():
-    view= ui.View(None)
+    view= ui.View(timeout=None)
     undo = ui.Button(style=ButtonStyle.green,label="이전으로",disabled=(True if page==1 else False))
     next = ui.Button(style=ButtonStyle.green,label="다음으로",disabled=(True if len(queue[guild]) <= page*10 else False))
     refresh= ui.Button(style=ButtonStyle.red,label="새로고침")
