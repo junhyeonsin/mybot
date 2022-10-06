@@ -536,7 +536,9 @@ async def dungeon(interaction:discord.Interaction,층:int):
     default.isItem()
     skill.isSkill()
     effect={}
+    print(dungeon_dic)
     dungeon_dic,content=DunGeon.go()
+    print(dungeon_dic)
     if content:
       return await interaction.response.send_message(content=content,ephemeral=True)
     global hp,mp,damage,enemy
