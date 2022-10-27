@@ -43,10 +43,10 @@ class MyClient(discord.Client):
       emoji_id=emoji_id.replace(">","")
       cur=con.cursor()
       #cur.execute("CREATE TABLE IF NOT EXISTS onoff(GUILD BIGINT PRIMARY KEY,ONOFF BOOL)")
-      cur.execute("SELECT ONOFF FROM onoff WHERE GUILD = %s",(guild.id))
+      cur.execute("SELECT ONOFF FROM onoff WHERE GUILD = %s",(str(guild.id)))
       check=cur.fetchone()
       if not check:
-        cur.execute("INSERT INTO onoff VALUES(%s,%s)",(guild.id,True))
+        cur.execute("INSERT INTO onoff VALUES(%s,%s)",(str(guild.id),True))
         con.commit()
         check=(True,0)
       guild_emoji=discord.Client.get_emoji(self,int(emoji_id))
