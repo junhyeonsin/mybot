@@ -129,9 +129,9 @@ tree = app_commands.CommandTree(client)
 youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': 'musics/%(id)s.%(ext)s',
+    'outtmpl': 'music/%(id)s.%(ext)s',
     'restrictfilenames': True,
-    'noplaylist': True,
+    'noplaylist': False,
     'nocheckcertificate': True,
     'ignoreerrors': False,
     'logtostderr': False,
@@ -142,7 +142,7 @@ ytdl_format_options = {
 }
 
 ffmpeg_options = {
-    'options': '-vn -an', 
+    'options': '-vn',
 }
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -155,14 +155,18 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=True):
+    async def from_url(cls, url, *, loop=False, stream=True):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         if 'entries' in data:
-            # take first item from a playlist
-            data=data['entries'][0]
+          # take first item from a playlist
+          data=data['entries'][0]
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+    @classmethod
+    async def test(cls,data):
+      return cls(discord.FFmpegPCMAudio(data['url'],**ffmpeg_options), data=data)
+
 queue={}
 @tree.command(name="이모지", description="이모지 확대기능 온오프")
 async def emojionoff(interaction:Interaction,온오프:onoff):
@@ -207,8 +211,9 @@ async def queuelist(interaction:Interaction):
     embed= discord.Embed(title="노래 리스트")
     for i in range((page-1)*10,page*10):
       if len(queue[guild])>i:
-        embed.add_field(name=f"{i+1}. {queue[guild][i].title}",value="\u200b",inline=False)
+        embed.add_field(name=f"{i+1}. {queue[guild][i][0].title} ({queue[guild][i][1]}) `{queue[guild][i][2]}`",value="\u200b",inline=False)
     embed.set_footer(text=f"Page : {page}")
+    embed.set_thumbnail(url=queue[guild][0][0].data['thumbnails'][-1]['url'] if len(queue[guild])>0 else None)
     return embed
   def vi():
     view= ui.View(timeout=None)
@@ -263,22 +268,108 @@ async def playmusic(interaction:Interaction,url_title:str,먼저틀기:bool=Fals
     if voice_client == None:
       await interaction.user.voice.channel.connect()
       voice_client: discord.VoiceClient = discord.utils.get(client.voice_clients, guild=interaction.guild)
-    player = await YTDLSource.from_url(url_title, loop=None)
-    if 먼저틀기 and len(queue[guild])>1:
-      queue[guild].insert(1,player)
-    else:
-      queue[guild].append(player)
-    if not voice_client.is_playing():
-      value="재생중!!"      
-      voice_client.play(player,after=lambda e: nextsong(interaction,e))    
-    else:
-      value="재생목록 추가됨!!"
-    embed=discord.Embed(title=f"{player.title} {value}")
-    embed.set_image(url=player.data['thumbnails'][-1]['url'])
-    await interaction.edit_original_response(content="",embed=embed)
-    await asyncio.sleep(7)
-    await interaction.delete_original_response()
-@tree.command(name="shuffle", description="노래 셔플")
+    with ytdl:
+      loop=False
+      loop = loop or asyncio.get_event_loop()
+      global data
+      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch6:{url_title}", download=False))
+      if not data['entries']:
+        player = await YTDLSource.from_url(url_title, loop=None)
+        if not player:
+          await interaction.edit_original_response(content="노래를 찾지 못했어요")
+          await asyncio.sleep(7)
+          return await interaction.delete_original_response()
+        else:
+          t=datetime.timedelta(seconds=player.data['duration'])
+          if 먼저틀기 and len(queue[guild])>1:
+            queue[guild].insert(1,(player,t,interaction.user))
+          else:
+            queue[guild].append((player,t,interaction.user))     #https://www.youtube.com/watch?v=Erkp04Sva4Q&list=PLOX-SZzyjidAJtecl2yAo9m47OUS3NBdF&index=14&ab_channel=memories
+          if not voice_client.is_playing():
+            value="재생중!!"      
+            voice_client.play(player,after=lambda e: nextsong(interaction,e))    
+          else:
+            value="재생목록 추가됨!!"
+          embed=discord.Embed(title=f"{player.title} {value} ({t})")
+          embed.set_image(url=player.data['thumbnails'][-1]['url'])
+          await interaction.edit_original_response(content="",embed=embed)
+          await asyncio.sleep(7)
+          return await interaction.delete_original_response()
+    embed=discord.Embed(title=f'노래 검색어:{url_title}')
+    view=ui.View(timeout=None)
+    #async def button(interaction:Interaction):
+    #  pass
+    async def button1(interaction:Interaction):
+      global data
+      data=data['entries'][0]
+      await playing(interaction,await YTDLSource.test(data))
+    async def button2(interaction:Interaction):
+      global data
+      data=data['entries'][1]
+      await playing(interaction,await YTDLSource.test(data))
+    async def button3(interaction:Interaction):
+      global data
+      data=data['entries'][2]
+      await playing(interaction,await YTDLSource.test(data))
+    async def button4(interaction:Interaction):
+      global data
+      data=data['entries'][3]
+      await playing(interaction,await YTDLSource.test(data))
+    async def button5(interaction:Interaction):
+      global data
+      data=data['entries'][4]
+      await playing(interaction,await YTDLSource.test(data))
+    async def button6(interaction:Interaction):
+      global data
+      data=data['entries'][5]
+      await playing(interaction,await YTDLSource.test(data))
+
+    async def cancel_callback(interaction:Interaction):
+      await interaction.response.edit_message(content="취소되었습니다.",view=None,embed=None)
+      await asyncio.sleep(7)
+      await interaction.delete_original_response()
+    for idx,music in enumerate(data['entries']):
+      embed.add_field(name=f"**{idx+1}. {music['title']}** ({datetime.timedelta(seconds=music['duration'])})",value='\u200b',inline=False)
+      #b=ui.Button(label=f'{idx+1}',style=ButtonStyle.green,custom_id=f'{idx}',row=(idx)//3)
+      #view.add_item(b)
+    b1=ui.Button(label='1',style=ButtonStyle.green,row=0)
+    b2=ui.Button(label='2',style=ButtonStyle.green,row=0)
+    b3=ui.Button(label='3',style=ButtonStyle.green,row=0)
+    b4=ui.Button(label='4',style=ButtonStyle.green,row=1)
+    b5=ui.Button(label='5',style=ButtonStyle.green,row=1)
+    b6=ui.Button(label='6',style=ButtonStyle.green,row=1)
+    view.add_item(b1)
+    view.add_item(b2)
+    view.add_item(b3)
+    view.add_item(b4)
+    view.add_item(b5)
+    view.add_item(b6)
+    b1.callback=button1
+    b2.callback=button2
+    b3.callback=button3
+    b4.callback=button4
+    b5.callback=button5
+    b6.callback=button6
+    cancel=ui.Button(label="cancel",style=ButtonStyle.red,row=2)
+    view.add_item(cancel)
+    cancel.callback=cancel_callback
+    await interaction.edit_original_response(embed=embed,view=view)
+    async def playing(interaction:Interaction,source:YTDLSource):
+      t=datetime.timedelta(seconds=source.data['duration'])
+      if 먼저틀기 and len(queue[guild])>1:
+        queue[guild].insert(1,(source,t,interaction.user))
+      else:
+        queue[guild].append((source,t,interaction.user))     #https://www.youtube.com/watch?v=Erkp04Sva4Q&list=PLOX-SZzyjidAJtecl2yAo9m47OUS3NBdF&index=14&ab_channel=memories
+      if not voice_client.is_playing():
+        value="재생중!!"      
+        voice_client.play(source,after=lambda e: nextsong(interaction,e))    
+      else:
+        value="재생목록 추가됨!!"
+      embed=discord.Embed(title=f"{source.title} {value} ({t})")
+      embed.set_image(url=source.data['thumbnails'][-1]['url'])
+      await interaction.response.edit_message(content="",embed=embed,view=None)
+      await asyncio.sleep(7)
+      return await interaction.delete_original_response()@tree.command(name="shuffle", description="노래 셔플")
 async def shfflemusic(interaction:Interaction):
   global queue
   guild=str(interaction.guild.id)
