@@ -971,6 +971,7 @@ async def dungeon(interaction: discord.Interaction, 층: int):
         if message_dic[str(interaction.user.id)]:
             await interaction.response.edit_message(embed=em(), view=vi())
         else:
+            # ?
             await interaction.edit_original_response(embed=em(), view=vi())
     message_dic[str(interaction.user.id)] = False
     await callback(interaction)
