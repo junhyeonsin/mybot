@@ -348,12 +348,6 @@ class Default():
     con.commit()
   def isInventory(self):
     cur=con.cursor()
-    li=['_use','_etc','_cash']
-    for i in li:
-      cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}{i}`(item_code INTEGER PRIMARY KEY, item_name TEXT, item_amount INTEGER, sold_gold INTEGER,trade INTEGER,url TEXT)")        
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_weapon`(item_code INTEGER AUTO_INCREMENT PRIMARY KEY, item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER,mp INTEGER, damage INTEGER, option1 INTEGER, option2 INTEGER, option3 INTEGER, wear INTEGER,trade INTEGER, url TEXT )")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_wear`(item_code INTEGER AUTO_INCREMENT PRIMARY KEY ,item_name TEXT , upgrade INTEGER, `rank` TEXT, level INTEGER, str INTEGER, dex INTEGER, `int` INTEGER, luck INTEGER, hp INTEGER,mp INTEGER, collection INTEGER,option1 INTEGER, option2 INTEGER, option3 INTEGER , wear INTEGER ,part INTEGER ,trade INTEGER, url TEXT)")
-    cur.execute(f"CREATE TABLE IF NOT EXISTS `{self.id}_skill`(skill_name TEXT, skill_id INTEGER PRIMARY KEY, skill_mana INTEGER, skill_hp	INTEGER, skill_damage INTEGER, skill_calculate 	INTEGER, skill_effect TEXT, skill_turn INTEGER, skill_class INTEGER, skill_image TEXT, skill_point INTEGER, skill_level INTEGER, skill_maxlevel INTEGER, skill_requirelevel INTEGER)")
   def first(self):
     cur=con.cursor()
     cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(None,"초보자의 검",0,"F",1,5,0,0,0,0,1,None,None,None,1,None))
@@ -404,7 +398,7 @@ class Reward():
     name=[]
     for i in range(len(rand)):
       cur=con.cursor()
-      cur.execute(f"UPDATE `{self.id}_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=%s",(code[i]))
+      cur.execute(f"UPDATE `user_etc` SET item_amount=item_amount+{rand[i]} WHERE item_code=%s and id = %s",(code[i],self.id))
       cur.execute(f"SELECT item_name FROM `{self.id}_etc` WHERE item_code = %s",(code[i]))
       name.append(cur.fetchone()[0])
     con.commit()
@@ -428,7 +422,7 @@ class Reward():
         j+=1
     name=[]
     for i in range(len(rand)):
-      cur.execute(f"UPDATE `{self.id}_use` SET item_amount=item_amount+{rand[i]} WHERE item_code=%s",(code[i]))
+      cur.execute(f"UPDATE `user_use` SET item_amount=item_amount+{rand[i]} WHERE item_code=%s and id=%s",(code[i],self.id))
       cur.execute(f"SELECT item_name FROM `{self.id}_use` WHERE item_code = %s",(code[i]))
       name.append(cur.fetchone()[0])
     con.commit()
@@ -461,7 +455,7 @@ class Reward():
       stat.append(0)
       stat.append(info[16])   
       stat.append(info[18])
-      cur.execute(f"INSERT INTO `{self.id}_wear` VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
+      cur.execute(f"INSERT INTO `user_wear` WHERE id={self.id} VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
       con.commit()
       return info[0]
     return None
@@ -490,7 +484,7 @@ class Reward():
         stat.append(None)
       stat.append(0)
       stat.append(info[16])
-      cur.execute(f"INSERT INTO `{self.id}_weapon` VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
+      cur.execute(f"INSERT INTO `user_weapon` WHERE id={self.id} VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(stat))  
       con.commit()
       return info[0]
     return None
@@ -548,7 +542,7 @@ class ItemInventory():
     self.value = value
   def item(self):
     cur=con.cursor()
-    cur.execute(f"SELECT * FROM `{self.id}{self.value}`")
+    cur.execute(f"SELECT * FROM `user{self.value}` WHERE id={self.id}")
     items=cur.fetchall()
     return items
   def display(self,item):
@@ -556,7 +550,7 @@ class ItemInventory():
     item=list(item)
     if self.value=="_weapon":
       item.pop(0)
-      cur.execute(f"SELECT * FROM `{self.id}{self.value}` WHERE wear = 1")
+      cur.execute(f"SELECT * FROM `user{self.value}` WHERE wear = 1 AND id={self.id}")
       wearing = cur.fetchone()
       gap=["" for _ in range(13)]
       if wearing:
